@@ -53,14 +53,14 @@ int _close_hook(slcan_state_t *s) {
 	return 0;
 }
 
-int _xmit_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, uint8_t len) {
+int _xmit_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len) {
 	printf("xmit: %d ext 0x%0X id %d len\n", ext, id, len);
 	for (int i = 0; i < len; i++) {
 		printf("\t%d: 0x%0X\n", i, buf[i]);
 	}
 }
 
-int _rtr_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t len) {
+int _rtr_hook(slcan_state_t *s, uint8_t ext, uint32_t id, size_t len) {
 	printf("rtr: %d ext 0x%0X id %d len\n", ext, id, len);
 }
 
