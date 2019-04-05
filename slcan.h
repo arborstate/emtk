@@ -1,6 +1,8 @@
 #ifndef _SLCAN_H_
 #define _SLCAN_H_
 
+#include <stdint.h>
+
 struct _slcan_state {
 	char _resp[8];
 	uint8_t is_open;
