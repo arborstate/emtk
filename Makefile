@@ -2,7 +2,7 @@
 CFLAGS += -g -I.
 LDFLAGS += -g
 
-MAIN_SOURCE = main.c slcan.c
+MAIN_SOURCE = main.c slcan.c util.c
 MAIN_OBJECTS = $(MAIN_SOURCE:.c=.o)
 CLEAN_FILES += $(MAIN_OBJECTS)
 TARGETS += main
