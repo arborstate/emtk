@@ -161,9 +161,9 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 
 		_VAL(can_id, 1, _dlc_pos - 1);
 
-		for (int i = 0; i < _msg_len; i += 2) {
-			_VAL(t, _dlc_pos + i, 2);
-			body[i] = t;
+		for (int i = 0; i < _msg_len; i ++) {
+			_VAL(t, (i * 2) + _dlc_pos + 1, 2);
+			body[i] = t & 0xFF;
 		}
 
 		_HOOK(xmit, s, cmd == 'T', can_id, body, _msg_len);
