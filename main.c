@@ -245,6 +245,8 @@ main(int argc, const char *argv[])
 		chan.slcan.resp_hook = _resp_hook;
 		chan.slcan.xmit_hook = _xmit_hook;
 
+		// Start with it open, since Linux will assume we are.
+		chan.slcan.is_open = 1;
 	}
 
 	mainloop(&chan, 1);
