@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 struct _slcan_state {
-	char _resp[8];
 	uint8_t is_open;
 	uint8_t speed;
 	void *data;
@@ -12,13 +11,10 @@ struct _slcan_state {
 	int (*speed_hook)(struct _slcan_state *s, uint8_t speed);
 	int (*open_hook)(struct _slcan_state *s);
 	int (*close_hook)(struct _slcan_state *s);
-	int (*version_hook)(struct _slcan_state *s, uint8_t *resp, size_t len);
-	int (*serial_hook)(struct _slcan_state *s, uint8_t *resp, size_t len);
-	int (*status_hook)(struct _slcan_state *s, uint8_t *resp, size_t len);
+	int (*status_hook)(struct _slcan_state *s);
 	int (*xmit_hook)(struct _slcan_state *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len);
 	int (*rtr_hook)(struct _slcan_state *s, uint8_t ext, uint32_t id, size_t len);
-
-	int (*resp_hook)(struct _slcan_state *s, uint8_t *buf, size_t len);
+	int (*resp_hook)(struct _slcan_state *s, const char *resp);
 };
 
 typedef struct _slcan_state slcan_state_t;

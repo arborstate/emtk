@@ -58,17 +58,27 @@ int _xmit_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t 
 	for (int i = 0; i < len; i++) {
 		printf("\t%d: 0x%0X\n", i, buf[i]);
 	}
+
+	return 0;
 }
 
 int _rtr_hook(slcan_state_t *s, uint8_t ext, uint32_t id, size_t len) {
 	printf("rtr: %d ext 0x%0X id %d len\n", ext, id, len);
+
+	return 0;
+}
+
+int _resp_hook(slcan_state_t *s, const char *resp) {
+	printf("sending response: '%s'\n", resp);
+
+	return strlen(resp);
 }
 
 int
 _test_slcan(void)
 {
-#define _CMD_POS(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) < 0) { printf("FAIL: incorrect return code: %d at %d\n", ret, __LINE__); return -1 ; }  printf("PASS: command succeeded\n"); } while (0)
-#define _CMD_NEG(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) >= 0) { printf("FAIL: incurrent return code : %d at %d\n", ret, __LINE__); return -1; }  printf("PASS: command succeeded\n"); } while (0)
+#define _CMD_POS(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) < 0) { printf("FAIL: incorrect return code: %d at %d\n", ret, __LINE__); return -1 ; }  printf("PASS: positive case succeeded\n"); } while (0)
+#define _CMD_NEG(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) >= 0) { printf("FAIL: incurrent return code : %d at %d\n", ret, __LINE__); return -1; }  printf("PASS: negative case failed\n"); } while (0)
 
 	{
 		int ret;
@@ -79,6 +89,7 @@ _test_slcan(void)
 		(&s)->close_hook = _close_hook;
 		(&s)->xmit_hook = _xmit_hook;
 		(&s)->rtr_hook = _rtr_hook;
+		(&s)->resp_hook = _resp_hook;
 
 		printf("testing hooks...\n");
 		_CMD_POS("O\r");

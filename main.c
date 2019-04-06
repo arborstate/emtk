@@ -85,18 +85,30 @@ struct _chan {
 };
 
 static int
-_version_hook(slcan_state_t *s, uint8_t *resp, size_t len)
-{
-	return snprintf(resp, len, "VBEEF");
-}
-
-static int
 _xmit_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len)
 {
 	struct _chan *chan = (struct _chan *)s->data;
 
 	LOG_INFO("chan %s request to xmit (%d ext) (0x%X id) (%d bytes): %s", chan->name, ext, id, len, _make_printable(buf, len));
 	return 0;
+}
+
+static int
+_resp_hook(slcan_state_t *s, const char *msg)
+{
+	struct _chan *chan = (struct _chan *)s->data;
+	size_t msglen = strlen(msg);
+	int ret;
+
+	ret = write(chan->fd, msg, msglen);
+
+	if (ret != msglen) {
+		LOG_ERROR("chan %s failed to write %d bytes: %s", chan->name, msglen, strerror(errno));
+
+		return -1;
+	}
+
+	return msglen;
 }
 
 int
@@ -131,29 +143,7 @@ chan_ingest(struct _chan *chan)
 
 		LOG_INFO("channel %s found command (%d bytes): %s", chan->name, found, _make_printable(chan->inbuf, found));
 
-		int resplen = slcan_handle_cmd(&(chan->slcan), chan->inbuf, found);
-
-		if (resplen < 0) {
-			LOG_ERROR("channel %s command error: %d", chan->name, resplen);
-			if ((chan->outbuf_pos + 1) >= chan->outbuf_size) {
-				LOG_ERROR("channel %s output buffer full!  dropping negative response.");
-			} else {
-				chan->outbuf[chan->outbuf_pos] = '\a';
-				chan->outbuf_pos += 1;
-			}
-		} else {
-			LOG_INFO("channel %s success response: %s", chan->name, _make_printable(chan->slcan._resp, resplen));
-			if ((chan->outbuf_pos + resplen + 1) >= chan->outbuf_size) {
-				LOG_ERROR("channel %s outbut buffer full!  dropping success response.");
-			} else {
-				memcpy(chan->outbuf + chan->outbuf_pos, chan->slcan._resp, resplen);
-				chan->outbuf_pos += resplen;
-
-				chan->outbuf[chan->outbuf_pos] = '\r';
-				chan->outbuf_pos += 1;
-			}
-		}
-
+		slcan_handle_cmd(&(chan->slcan), chan->inbuf, found);
 
 		memmove(chan->inbuf + found, chan->inbuf, chan->inbuf_pos - found);
 
@@ -210,24 +200,6 @@ mainloop(struct _chan *chan, size_t nchan)
 				if (ret < 0) {
 					return -1;
 				}
-
-				// XXX - FIX ME - This is a naive way to flush the output buffer.
-				if (chan[i].outbuf_pos != 0) {
-					LOG_DEBUG("chan %s output buffer (%d bytes): %s", chan[i].name, chan[i].outbuf_pos, _make_printable(chan[i].outbuf, chan[i].outbuf_pos));
-					ret = write(fds[i].fd, chan[i].outbuf, chan[i].outbuf_pos);
-
-					if (ret < 0) {
-						LOG_ERROR("channel %s failed to write: %s", chan[i].name, strerror(errno));
-						return -1;
-					}
-
-					if (ret != chan[i].outbuf_pos) {
-						LOG_ERROR("chan %s couldn't write all bytes!", chan[i].name, strerror(errno));
-						return -1;
-					}
-
-					chan[i].outbuf_pos = 0;
-				}
 			}
 		}
 	}
@@ -270,7 +242,9 @@ main(int argc, const char *argv[])
 
 		slcan_init(&chan.slcan);
 		chan.slcan.data = (void *)&chan;
-		chan.slcan.version_hook = _version_hook;
+		chan.slcan.resp_hook = _resp_hook;
+		chan.slcan.xmit_hook = _xmit_hook;
+
 	}
 
 	mainloop(&chan, 1);

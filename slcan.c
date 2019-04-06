@@ -46,10 +46,11 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		return 0;
 	}
 
-#define _MIN_ARG(x) do { if (len < x) { return -1; } } while (0)
-#define _CHECK_OPEN(x) if (s->is_open != x) return -2
-#define _VAL(var, offset, len) if (_be_hex_to_uint32(buf + offset, len, &var) < 0) return -3
-#define _HOOK(x, ...) if (s->x ## _hook) { ret = s->x ## _hook(__VA_ARGS__); }
+#define _HOOK(x, ...) if (s->x ## _hook) ret = s->x ## _hook(__VA_ARGS__)
+#define _ERROR(x) do { _HOOK(resp, s, "\a"); return x; } while (0)
+#define _MIN_ARG(x) if (len < x) _ERROR(-1)
+#define _CHECK_OPEN(x) if (s->is_open != x) _ERROR(-2)
+#define _VAL(var, offset, len) if (_be_hex_to_uint32(buf + offset, len, &var) < 0) _ERROR(-3)
 
 	int ret = 0;
 
@@ -83,10 +84,10 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		case 8:
 			// 1m
 		default:
-			return -1;
+			_ERROR(-1);
 		}
 
-		_HOOK(speed, s, new_speed)
+		_HOOK(speed, s, new_speed);
 
 		if (ret == 0) {
 			s->speed = new_speed;
@@ -108,7 +109,7 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		// Open the channel.
 		_MIN_ARG(2);
 
-		_HOOK(open, s)
+		_HOOK(open, s);
 
 		if (ret == 0) {
 			s->is_open = 1;
@@ -122,7 +123,7 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		// Close the channel.
 		_MIN_ARG(2);
 
-		_HOOK(close, s)
+		_HOOK(close, s);
 
 		if (ret == 0) {
 			s->is_open = 0;
@@ -158,19 +159,21 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		uint32_t t;
 		uint8_t body[8];
 
-		_VAL(can_id, 1, _dlc_pos);
+		_VAL(can_id, 1, _dlc_pos - 1);
 
 		for (int i = 0; i < _msg_len; i += 2) {
 			_VAL(t, _dlc_pos + i, 2);
 			body[i] = t;
 		}
 
-		_HOOK(xmit, s, cmd == 'T', can_id, buf, _msg_len)
+		_HOOK(xmit, s, cmd == 'T', can_id, body, _msg_len);
 
 		if (ret == 0) {
-			s->_resp[0] = cmd == 'T' ? 'Z' : 'z';
-			s->_resp[1] = '\0';
-			ret = 1;
+			if (cmd == 'T') {
+				_HOOK(resp, s, "Z");
+			} else {
+				_HOOK(resp, s, "z");
+			}
 		}
 
 		break;
@@ -195,12 +198,14 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		_VAL(can_id, 1, can_id_len);
 		_VAL(msg_len, 1 + can_id_len, 1);
 
-		_HOOK(rtr, s, cmd == 'R', can_id, msg_len)
+		_HOOK(rtr, s, cmd == 'R', can_id, msg_len);
 
 		if (ret == 0) {
-			s->_resp[0] = cmd == 'R' ? 'Z' : 'z';
-			s->_resp[1] = '\0';
-			ret = 1;
+			if (cmd == 'R') {
+				_HOOK(resp, s, "Z");
+			} else {
+				_HOOK(resp, s, "z");
+			}
 		}
 
 		break;
@@ -211,10 +216,10 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		_MIN_ARG(2);
 		_CHECK_OPEN(1);
 
-		_HOOK(status, s, s->_resp, sizeof(s->_resp)) else {
-			const char *resp = "F00";
-			strncpy(s->_resp, resp, sizeof(s->_resp));
-			ret = strlen(resp);
+		_HOOK(status, s);
+
+		if (ret == 0) {
+			_HOOK(resp, s, "F00");
 		}
 
 		break;
@@ -231,25 +236,13 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 	case 'V':
 		// Get Version Number
 		_MIN_ARG(2);
-
-		_HOOK(version, s, s->_resp, sizeof(s->_resp)) else {
-			const char *resp = "V0000";
-			strncpy(s->_resp, resp, sizeof(s->_resp));
-			ret = strlen(resp);
-		}
-
+		_HOOK(resp, s, "V0000");
 		break;
 
 	case 'N':
 		// Get Serial Number
 		_MIN_ARG(2);
-
-		_HOOK(version, s, s->_resp, sizeof(s->_resp)) else {
-			const char *resp = "N0000";
-			strncpy(s->_resp, resp, sizeof(s->_resp));
-			ret = strlen(resp);
-		}
-
+		_HOOK(resp, s, "N0000");
 		break;
 	default:
 		// Unknown command
@@ -261,5 +254,10 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 	#undef _MIN_ARG
 
 
+	if (ret == 0) {
+		_HOOK(resp, s, "\r");
+	}
+
 	return ret;
+
 }
