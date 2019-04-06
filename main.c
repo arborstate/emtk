@@ -155,7 +155,7 @@ mainloop(struct _chan *chan, size_t nchan)
 int
 usage(const char *progname)
 {
-	printf("%s serialPort\n", progname);
+	printf("%s serialPort0 [.. serialPortN]\n", progname);
 
 	return -1;
 }
@@ -163,42 +163,56 @@ usage(const char *progname)
 int
 main(int argc, const char *argv[])
 {
+	int ret = 0;
+
 	if (argc < 2) {
 		return usage(argv[0]);
 	}
 
-	struct _chan chan;
+	int nchans = argc - 1;
+	struct _chan chans[nchans];
+	memset(chans, 0, sizeof(chans));
+
 	// Open the PTY/serial port.
-	{
-		const char *fname = argv[1];
+	for (int i = 0; i < nchans; i++) {
+		struct _chan *chan;
+		chan = &chans[i];
+
+		const char *fname = argv[i + 1];
 		int iofd = open(fname, O_RDWR | O_NONBLOCK);
 
 		LOG_DEBUG("opening %s...", fname);
 		if (iofd < 0) {
 			LOG_ERROR("failed to open I/O port '%s': %s", fname, strerror(errno));
-			return -1;
+			ret = -1;
+			goto bail;
 		}
 
-		chan.name = fname;
-		chan.fd = iofd;
-		chan.outbuf_size = sizeof(chan.outbuf);
-		chan.outbuf_pos = 0;
+		chan->name = fname;
+		chan->fd = iofd;
+		chan->outbuf_size = sizeof(chan->outbuf);
+		chan->outbuf_pos = 0;
 
-		chan.inbuf_size = sizeof(chan.inbuf);
-		chan.inbuf_pos = 0;
+		chan->inbuf_size = sizeof(chan->inbuf);
+		chan->inbuf_pos = 0;
 
-		slcan_init(&chan.slcan);
-		chan.slcan.data = (void *)&chan;
-		chan.slcan.resp_hook = _resp_hook;
-		chan.slcan.xmit_hook = _xmit_hook;
+		slcan_init(&(chan->slcan));
+		chan->slcan.data = (void *)chan;
+		chan->slcan.resp_hook = _resp_hook;
+		chan->slcan.xmit_hook = _xmit_hook;
 
 		// Start with it open, since Linux will assume we are.
-		chan.slcan.is_open = 1;
+		chan->slcan.is_open = 1;
 	}
 
-	mainloop(&chan, 1);
+	mainloop(chans, nchans);
 
-	close(chan.fd);
+bail:
+	for (int i = 0; i < nchans; i++) {
+		if (chans[i].fd != 0) {
+			close(chans[i].fd);
+		}
+	}
 
-	return 0;
+	return ret;
 }
