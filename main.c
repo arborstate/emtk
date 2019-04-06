@@ -113,10 +113,12 @@ chan_ingest(struct _chan *chan)
 
 	// See if we have a CR.
 	for (int i = 0; i < chan->inbuf_pos; i++) {
+#if 0
 		// XXX - Do this for testing only.
 		if (chan->inbuf[i] == '\n') {
 			chan->inbuf[i] = '\r';
 		}
+#endif
 
 		if (chan->inbuf[i] == '\r') {
 			found = i;
