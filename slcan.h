@@ -21,5 +21,6 @@ typedef struct _slcan_state slcan_state_t;
 
 int slcan_init(slcan_state_t *s);
 int slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len);
+int slcan_recv_data_frame(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len);
 
 #endif /* _SLCAN_H_ */

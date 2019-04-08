@@ -261,3 +261,46 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 	return ret;
 
 }
+
+int
+slcan_recv_data_frame(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len)
+{
+	int ret = 0;
+	int n = 0;
+	const char hex[] = "0123456789ABCDEF";
+
+	if (len > 8) {
+		return -1;
+	}
+
+	uint8_t outbuf[1 + (ext ? 8 : 3) + (len * 2) + 1 + 1];
+
+	outbuf[n++] = ext ? 'T' : 't';
+
+	if (ext) {
+		for (int i = 3; i >= 0; i--) {
+			uint8_t v = id >> (i * 8);
+			outbuf[n++] = hex[(v >> 4) & 0xF];
+			outbuf[n++] = hex[v & 0xF];
+		}
+	} else {
+		outbuf[n++] = hex[(id >> 8) & 0xF];
+		outbuf[n++] = hex[(id >> 4) & 0xF];
+		outbuf[n++] = hex[id & 0xF];
+	}
+
+	outbuf[n++] = hex[len];
+
+	for (int i = 0; i < len; i++) {
+		outbuf[n++] = hex[(buf[i] >> 4) & 0xF];
+		outbuf[n++] = hex[buf[i] & 0xF];
+
+	}
+
+	outbuf[n++] = '\r';
+	outbuf[n++] = '\0';
+
+	_HOOK(resp, s, outbuf);
+
+	return ret;
+}
