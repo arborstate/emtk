@@ -17,7 +17,7 @@ _log(const char *level, const char *fmt, ...)
 
 
 const char *
-_make_printable(uint8_t *buf, size_t nbuf)
+_make_printable(const uint8_t *buf, size_t nbuf)
 {
 	static char s[1024];
 	const char hex[] = "0123456789abcdef";
