@@ -250,10 +250,6 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		break;
 	}
 
-	#undef _CHECK_OPEN
-	#undef _MIN_ARG
-
-
 	if (ret == 0) {
 		_HOOK(resp, s, "\r");
 	}
@@ -304,3 +300,8 @@ slcan_recv_data_frame(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, 
 
 	return ret;
 }
+
+#undef _CHECK_OPEN
+#undef _MIN_ARG
+#undef _ERROR
+#undef _HOOK
