@@ -170,9 +170,9 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 
 		if (ret == 0) {
 			if (cmd == 'T') {
-				_HOOK(resp, s, "Z");
+				_HOOK(resp, s, "Z\r");
 			} else {
-				_HOOK(resp, s, "z");
+				_HOOK(resp, s, "z\r");
 			}
 		}
 
@@ -202,9 +202,9 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 
 		if (ret == 0) {
 			if (cmd == 'R') {
-				_HOOK(resp, s, "Z");
+				_HOOK(resp, s, "Z\r");
 			} else {
-				_HOOK(resp, s, "z");
+				_HOOK(resp, s, "z\r");
 			}
 		}
 
@@ -219,7 +219,7 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 		_HOOK(status, s);
 
 		if (ret == 0) {
-			_HOOK(resp, s, "F00");
+			_HOOK(resp, s, "F00\r");
 		}
 
 		break;
@@ -236,13 +236,13 @@ slcan_handle_cmd(slcan_state_t *s, uint8_t *buf, size_t len)
 	case 'V':
 		// Get Version Number
 		_MIN_ARG(2);
-		_HOOK(resp, s, "V0000");
+		_HOOK(resp, s, "V0000\r");
 		break;
 
 	case 'N':
 		// Get Serial Number
 		_MIN_ARG(2);
-		_HOOK(resp, s, "N0000");
+		_HOOK(resp, s, "N0000\r");
 		break;
 	default:
 		// Unknown command
