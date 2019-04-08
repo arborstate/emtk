@@ -14,6 +14,7 @@
 #include "emdb.h"
 #include "log.h"
 #include "slcan.h"
+#include "isotp.h"
 
 
 struct _chan {
@@ -29,23 +30,45 @@ struct _chan {
 	size_t outbuf_size;
 
 	slcan_state_t slcan;
+	isotp_state_t isotp;
 };
 
 static int
-_xmit_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len)
+_isotp_recv_hook(isotp_state_t *t, uint8_t *buf, size_t len) {
+	LOG_INFO("isotp %s completed message received: %s", t->name, _make_printable(buf, len));
+}
+
+static int
+_isotp_xmit_hook(isotp_state_t *t, uint8_t ext, uint32_t can_id, uint8_t *buf, size_t len)
+{
+	struct _chan *chan = (struct _chan *)t->data;
+
+	return slcan_recv_data_frame(&chan->slcan, ext, can_id, buf, len);
+}
+
+static int
+_slcan_xmit_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len)
 {
 	struct _chan *chan = (struct _chan *)s->data;
 
 	LOG_INFO("chan %s request to xmit (%d ext) (0x%X id) (%d bytes): %s", chan->name, ext, id, len, _make_printable(buf, len));
+
+
+	if (id == chan->isotp.src_can_id) {
+		isotp_ingest_frame(&chan->isotp, buf, len);
+	}
+
 	return 0;
 }
 
 static int
-_resp_hook(slcan_state_t *s, const char *msg)
+_slcan_resp_hook(slcan_state_t *s, const char *msg)
 {
 	struct _chan *chan = (struct _chan *)s->data;
 	size_t msglen = strlen(msg);
 	int ret;
+
+	LOG_DEBUG("chan %s writing out: %s", chan->name, _make_printable(msg, strlen(msg)));
 
 	ret = write(chan->fd, msg, msglen);
 
@@ -198,11 +221,19 @@ main(int argc, const char *argv[])
 
 		slcan_init(&(chan->slcan));
 		chan->slcan.data = (void *)chan;
-		chan->slcan.resp_hook = _resp_hook;
-		chan->slcan.xmit_hook = _xmit_hook;
+		chan->slcan.resp_hook = _slcan_resp_hook;
+		chan->slcan.xmit_hook = _slcan_xmit_hook;
 
 		// Start with it open, since Linux will assume we are.
 		chan->slcan.is_open = 1;
+
+		isotp_init(&(chan->isotp));
+		chan->isotp.name = "0";
+		chan->isotp.data = (void *)chan;
+		chan->isotp.src_can_id = 0x12345678;
+		chan->isotp.dest_can_id = 0x12345679;
+		chan->isotp.xmit_hook = _isotp_xmit_hook;
+		chan->isotp.recv_hook = _isotp_recv_hook;
 	}
 
 	mainloop(chans, nchans);
