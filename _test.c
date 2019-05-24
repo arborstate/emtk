@@ -105,6 +105,7 @@ _test_slcan(void)
 		_CMD_POS("C\r");
 		_CMD_NEG("T0000010021133\r");
 	}
+#undef _CMD_NEG
 #undef _CMD_POS
 }
 
