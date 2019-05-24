@@ -4,6 +4,7 @@
 
 #include "util.h"
 #include "slcan.h"
+#include "log.h"
 
 
 #define QUOTE(str) #str
@@ -18,19 +19,19 @@ _test_hex(void)
 #define _CHECK_POS(x, y) \
 	do {								\
 		uint32_t v;						\
-		if (_be_hex_to_uint32(x, strlen(x), &v) < 0) { printf("conversion failed\n"); return -1; } \
-		if (v != y) { printf("FAIL \"" x "\" != " QUOTE(y) " it's 0x%x\n", v); return -1; } \
-		printf("PASS \"" x "\" == " QUOTE(y) "\n");		\
+		if (_be_hex_to_uint32(x, strlen(x), &v) < 0) { LOG_ERROR("conversion failed"); return -1; } \
+		if (v != y) { _log("FAIL", "\"" x "\" != " QUOTE(y) " it's 0x%x", v); return -1; } \
+		_log("PASS", "\"" x "\" == " QUOTE(y));		\
 	} while (0)
 
 #define _CHECK_NEG(x, y)						\
 	do {								\
 		uint32_t v;						\
 		if (_be_hex_to_uint32(x, strlen(x), &v) >= 0) { \
-			printf ("FAIL conversion succeeded when it shouldn't\n"); \
+			_log("FAIL", "conversion succeeded when it shouldn't"); \
  			return -1;					\
 		}							\
-		printf("PASS \"" x "\" didn't convert\n");		\
+		_log("PASS", "\"" x "\" didn't convert");		\
 	} while (0)
 
 	_CHECK_POS("A", 0xa);
@@ -47,32 +48,32 @@ _test_hex(void)
 }
 
 int _open_hook(slcan_state_t *s) {
-	printf("open hook.\n");
+	LOG_DEBUG("open hook.");
 	return 0;
 }
 
 int _close_hook(slcan_state_t *s) {
-	printf("close hook.\n");
+	LOG_DEBUG("close hook.");
 	return 0;
 }
 
 int _xmit_hook(slcan_state_t *s, uint8_t ext, uint32_t id, uint8_t *buf, size_t len) {
-	printf("xmit: %d ext 0x%0X id %d len\n", ext, id, len);
+	LOG_DEBUG("xmit: %d ext 0x%0X id %d len", ext, id, len);
 	for (int i = 0; i < len; i++) {
-		printf("\t%d: 0x%0X\n", i, buf[i]);
+		LOG_DEBUG("\t%d: 0x%0X", i, buf[i]);
 	}
 
 	return 0;
 }
 
 int _rtr_hook(slcan_state_t *s, uint8_t ext, uint32_t id, size_t len) {
-	printf("rtr: %d ext 0x%0X id %d len\n", ext, id, len);
+	LOG_DEBUG("rtr: %d ext 0x%0X id %d len", ext, id, len);
 
 	return 0;
 }
 
 int _resp_hook(slcan_state_t *s, const char *resp) {
-	printf("sending response: '%s'\n", _P(resp));
+	LOG_DEBUG("sending response: '%s'", _P(resp));
 
 	return strlen(resp);
 }
@@ -80,8 +81,8 @@ int _resp_hook(slcan_state_t *s, const char *resp) {
 int
 _test_slcan(void)
 {
-#define _CMD_POS(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) < 0) { printf("FAIL: incorrect return code: %d at %d\n", ret, __LINE__); return -1 ; }  printf("PASS: positive case succeeded\n"); } while (0)
-#define _CMD_NEG(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) >= 0) { printf("FAIL: incurrent return code : %d at %d\n", ret, __LINE__); return -1; }  printf("PASS: negative case failed\n"); } while (0)
+#define _CMD_POS(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) < 0) { _log("FAIL", "incorrect return code: %d at %d", ret, __LINE__); return -1 ; }  _log("PASS", "positive case succeeded"); } while (0)
+#define _CMD_NEG(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) >= 0) { _log("FAIL", "incurrent return code : %d at %d", ret, __LINE__); return -1; }  _log("PASS", "negative case failed"); } while (0)
 
 	{
 		int ret;
@@ -94,7 +95,7 @@ _test_slcan(void)
 		(&s)->rtr_hook = _rtr_hook;
 		(&s)->resp_hook = _resp_hook;
 
-		printf("testing hooks...\n");
+		LOG_INFO("testing hooks...");
 		_CMD_POS("O\r");
 		_CMD_POS("T0000010021133\r");
 		_CMD_NEG("T0000010021\r");
