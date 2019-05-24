@@ -2,10 +2,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "util.h"
 #include "slcan.h"
 
 
 #define QUOTE(str) #str
+
+#define _P(str) _make_printable(str, strlen(str))
 
 int _be_hex_to_uint32(uint8_t *buf, size_t len, uint32_t *ret);
 
@@ -69,7 +72,7 @@ int _rtr_hook(slcan_state_t *s, uint8_t ext, uint32_t id, size_t len) {
 }
 
 int _resp_hook(slcan_state_t *s, const char *resp) {
-	printf("sending response: '%s'\n", resp);
+	printf("sending response: '%s'\n", _P(resp));
 
 	return strlen(resp);
 }
