@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include "log.h"
 #include "script.h"
@@ -84,3 +86,32 @@ script_word_lookup(script_state_t *state, const char *s)
 }
 
 #undef _STACK
+
+int
+script_word_ingest(script_state_t *state, const char *s)
+{
+	script_word_t w;
+
+	w = script_word_lookup(state, s);
+
+	if (w != NULL) {
+		w(state);
+
+		return 0;
+	}
+
+	errno = 0;
+
+	char *endptr;
+
+	uint32_t v = strtol(s, &endptr, 0);
+
+	if (errno != 0) {
+		LOG_ERROR("failed to convert literal '%s': %s", s, strerror(errno));
+		return -1;
+	}
+
+	script_push(state, v);
+
+	return 0;
+}
