@@ -123,27 +123,24 @@ _test_script(void)
 	_W(0x1);
 
 	_W(dup);
-	_W(add);
+	_W(+);
 
 	_W(0xDEADBEEF);
 
 	_W(swap);
 
-	uint32_t v;
-
-	v = script_pop(&state);
-	LOG_DEBUG("script returned 0x%0X", v);
-
+	_W(.);
 	_W(dup);
 	_W(1);
-	_W(add);
+	_W(+);
 
 	_W(swap);
 
-	v = script_pop(&state);
-	LOG_DEBUG("script returned 0x%0X", v);
+	_W(.);
 
 	_W(drop);
+
+	script_eval(&state, "3 4 + .");
 
 	LOG_DEBUG("script stackpos is %d", state.stackpos);
 
