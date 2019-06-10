@@ -25,8 +25,6 @@ int script_word_ingest(script_state_t *state, const char *s);
 int script_eval_str(script_state_t *state, const char *s);
 int script_eval_buf(script_state_t *state, const char *s, size_t len);
 
-
-
 #define SCRIPT_DEF_WORD(x) void script_word_ ## x (script_state_t *state)
 
 #endif /* __SCRIPT_H__ */
