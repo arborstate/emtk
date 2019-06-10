@@ -107,6 +107,8 @@ _test_slcan(void)
 	}
 #undef _CMD_NEG
 #undef _CMD_POS
+
+	return 0;
 }
 
 int
