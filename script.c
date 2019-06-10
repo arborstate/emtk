@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "log.h"
 #include "script.h"
@@ -113,6 +114,46 @@ script_word_ingest(script_state_t *state, const char *s)
 	}
 
 	script_push(state, v);
+
+	return 0;
+}
+
+int
+script_eval(script_state_t *state, const char *s)
+{
+	char word[32];
+	size_t wordpos = 0;
+	int inword = 0;
+
+	while (*s != '\0') {
+		if (isspace(*s)) {
+			if (inword) {
+				word[wordpos] = '\0';
+
+				if (script_word_ingest(state, word) != 0) {
+					return -1;
+				}
+
+				wordpos = 0;
+				inword = 0;
+			}
+		} else {
+			word[wordpos] = *s;
+			wordpos += 1;
+			inword = 1;
+		}
+
+		s += 1;
+	}
+
+	// Leftovers.
+	if (inword) {
+		word[wordpos] = '\0';
+
+		if (script_word_ingest(state, word) != 0) {
+			return -1;
+		}
+	}
 
 	return 0;
 }

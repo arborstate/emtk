@@ -18,6 +18,7 @@ void script_push(script_state_t *state, uint32_t v);
 uint32_t script_pop(script_state_t *state);
 script_word_t script_word_lookup(script_state_t *state, const char *s);
 int script_word_ingest(script_state_t *state, const char *s);
+int script_eval(script_state_t *state, const char *s);
 
 
 
