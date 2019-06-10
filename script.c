@@ -79,17 +79,17 @@ script_pop(script_state_t *state) {
 script_word_t
 script_word_lookup(script_state_t *state, const char *s)
 {
-#define _S_ALIAS(x, alias) if (strcmp(s, #alias) == 0) return script_word_ ## x
-#define _S(x) _S_ALIAS(x, x)
-	_S(dup);
-	_S(drop);
-	_S(swap);
-	_S_ALIAS(add, +);
-	_S_ALIAS(is_zero, 0=);
-	_S_ALIAS(mult, *);
-	_S_ALIAS(pop_and_display, .);
-#undef _S
-#undef _S_ALIAS
+#define _W_ALIAS(x, alias) if (strcmp(s, #alias) == 0) return script_word_ ## x
+#define _W(x) _W_ALIAS(x, x)
+	_W(dup);
+	_W(drop);
+	_W(swap);
+	_W_ALIAS(add, +);
+	_W_ALIAS(is_zero, 0=);
+	_W_ALIAS(mult, *);
+	_W_ALIAS(pop_and_display, .);
+#undef _W
+#undef _W_ALIAS
 
 	// No match found.
 	return NULL;
