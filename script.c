@@ -49,6 +49,13 @@ SCRIPT_DEF_WORD(mult)
 	_STACK(1) = _STACK(1) * _STACK(0);
 }
 
+SCRIPT_DEF_WORD(pop_and_display)
+{
+	uint32_t v = script_pop(state);
+
+	LOG_INFO("0x%X", v);
+}
+
 int
 script_state_init(script_state_t *state)
 {
@@ -79,6 +86,7 @@ script_word_lookup(script_state_t *state, const char *s)
 	_S_ALIAS(add, +);
 	_S_ALIAS(is_zero, 0=);
 	_S_ALIAS(mult, *);
+	_S_ALIAS(pop_and_display, .);
 #undef _S
 #undef _S_ALIAS
 
