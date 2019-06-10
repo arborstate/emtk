@@ -140,7 +140,7 @@ _test_script(void)
 
 	_W(drop);
 
-	script_eval(&state, "3 4 + .");
+	script_eval_str(&state, "3 4 + .\r");
 
 	LOG_DEBUG("script stackpos is %d", state.stackpos);
 

@@ -60,6 +60,7 @@ int
 script_state_init(script_state_t *state)
 {
 	state->stackpos = 0;
+	state->wordpos = 0;
 }
 
 void
@@ -127,40 +128,33 @@ script_word_ingest(script_state_t *state, const char *s)
 }
 
 int
-script_eval(script_state_t *state, const char *s)
+script_eval_str(script_state_t *state, const char *s)
 {
-	char word[32];
-	size_t wordpos = 0;
-	int inword = 0;
+	return script_eval_buf(state, s, strlen(s));
+}
 
-	while (*s != '\0') {
+int
+script_eval_buf(script_state_t *state, const char *s, size_t len)
+{
+	const char *end = s + len;
+
+	while (s < end) {
 		if (isspace(*s)) {
-			if (inword) {
-				word[wordpos] = '\0';
+			if (state->wordpos != 0) {
+				state->word[state->wordpos] = '\0';
 
-				if (script_word_ingest(state, word) != 0) {
+				if (script_word_ingest(state, state->word) != 0) {
 					return -1;
 				}
 
-				wordpos = 0;
-				inword = 0;
+				state->wordpos = 0;
 			}
 		} else {
-			word[wordpos] = *s;
-			wordpos += 1;
-			inword = 1;
+			state->word[state->wordpos] = *s;
+			state->wordpos += 1;
 		}
 
 		s += 1;
-	}
-
-	// Leftovers.
-	if (inword) {
-		word[wordpos] = '\0';
-
-		if (script_word_ingest(state, word) != 0) {
-			return -1;
-		}
 	}
 
 	return 0;
