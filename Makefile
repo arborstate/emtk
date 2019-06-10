@@ -17,10 +17,10 @@ CLEAN_FILES += $(TARGETS)
 all: $(TARGETS)
 
 main: $(MAIN_OBJECTS) slcan.h
-	$(CC) -o $@ $(MAIN_OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(MAIN_OBJECTS)
 
 _test: $(TEST_OBJECTS) slcan.h
-	$(CC) -o $@ $(TEST_OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(TEST_OBJECTS)
 
 clean:
 	$(RM) $(CLEAN_FILES)
