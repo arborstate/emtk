@@ -85,6 +85,7 @@ script_word_lookup(script_state_t *state, const char *s)
 	return NULL;
 }
 
+#undef _STACKINC
 #undef _STACK
 
 int

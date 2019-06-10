@@ -115,17 +115,17 @@ _test_slcan(void)
 int
 _test_script(void)
 {
-#define _W(x) script_word_lookup(&state, #x)(&state)
+#define _W(x) if (script_word_ingest(&state, #x) != 0) return -1
 	script_state_t state;
 
 	script_state_init(&state);
 
-	script_push(&state, 0x1);
+	_W(0x1);
 
 	_W(dup);
 	_W(add);
 
-	script_push(&state, 0xDEADBEEF);
+	_W(0xDEADBEEF);
 
 	_W(swap);
 
@@ -135,7 +135,7 @@ _test_script(void)
 	LOG_DEBUG("script returned 0x%0X", v);
 
 	_W(dup);
-	script_push(&state, 1);
+	_W(1);
 	_W(add);
 
 	_W(swap);
