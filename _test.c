@@ -5,6 +5,7 @@
 #include "util.h"
 #include "slcan.h"
 #include "log.h"
+#include "script.h"
 
 
 #define QUOTE(str) #str
@@ -112,6 +113,44 @@ _test_slcan(void)
 }
 
 int
+_test_script(void)
+{
+#define _W(x) script_word_lookup(&state, #x)(&state)
+	script_state_t state;
+
+	script_state_init(&state);
+
+	script_push(&state, 0x1);
+
+	_W(dup);
+	_W(add);
+
+	script_push(&state, 0xDEADBEEF);
+
+	_W(swap);
+
+	uint32_t v;
+
+	v = script_pop(&state);
+	LOG_DEBUG("script returned 0x%0X", v);
+
+	_W(dup);
+	script_push(&state, 1);
+	_W(add);
+
+	_W(swap);
+
+	v = script_pop(&state);
+	LOG_DEBUG("script returned 0x%0X", v);
+
+	_W(drop);
+
+	LOG_DEBUG("script stackpos is %d", state.stackpos);
+
+	return 0;
+}
+
+int
 main(void)
 {
 
@@ -120,6 +159,10 @@ main(void)
 	}
 
 	if (_test_slcan() != 0) {
+		return -1;
+	}
+
+	if (_test_script() != 0) {
 		return -1;
 	}
 

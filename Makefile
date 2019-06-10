@@ -7,7 +7,7 @@ MAIN_OBJECTS = $(MAIN_SOURCE:.c=.o)
 CLEAN_FILES += $(MAIN_OBJECTS)
 TARGETS += main
 
-TEST_SOURCE = slcan.c isotp.c util.c _test.c log_stdout.c
+TEST_SOURCE = script.c slcan.c isotp.c util.c _test.c log_stdout.c
 TEST_OBJECTS = $(TEST_SOURCE:.c=.o)
 CLEAN_FILES += $(TEST_OBJECTS)
 TARGETS += _test
