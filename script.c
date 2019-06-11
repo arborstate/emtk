@@ -7,6 +7,14 @@
 #include "log.h"
 #include "script.h"
 
+void
+script_restart(script_state_t *state)
+{
+	LOG_DEBUG("restarting script environment");
+	state->stackpos = 0;
+	state->wordpos = 0;
+}
+
 #define _STACK(pos) state->stack[state->stackpos - pos]
 #define _STACKINC(v) state->stackpos += v
 
@@ -56,6 +64,11 @@ SCRIPT_DEF_WORD(pop_and_display)
 	LOG_INFO("0x%X", v);
 }
 
+SCRIPT_DEF_WORD(quit)
+{
+	script_restart(state);
+}
+
 void
 script_push(script_state_t *state, uint32_t v) {
 	_STACK(0) = v;
@@ -75,6 +88,7 @@ script_pop(script_state_t *state) {
 script_word_info_t script_words_def[] = {
 #define _W_ALIAS(x, alias) { #alias, script_word_ ## x }
 #define _W(x) _W_ALIAS(x, x)
+	_W(quit),
 	_W(dup),
 	_W(drop),
 	_W(swap),
@@ -99,8 +113,7 @@ script_add_vocab(script_state_t *state, script_word_info_t *vocab)
 int
 script_state_init(script_state_t *state)
 {
-	state->stackpos = 0;
-	state->wordpos = 0;
+	script_restart(state);
 	state->vocabpos = 0;
 
 	script_add_vocab(state, script_words_def);
@@ -148,14 +161,14 @@ script_word_ingest(script_state_t *state, const char *s)
 
 	uint32_t v = strtol(s, &endptr, 0);
 
-	if (errno != 0) {
-		LOG_ERROR("failed to convert literal '%s': %s", s, strerror(errno));
-		return -1;
+	if (*endptr == '\0' && errno == 0) {
+		script_push(state, v);
+		return 0;
 	}
 
-	script_push(state, v);
+	LOG_ERROR("failed to ingest word '%s'", s);
 
-	return 0;
+	return -1;
 }
 
 int
@@ -175,6 +188,7 @@ script_eval_buf(script_state_t *state, const char *s, size_t len)
 				state->word[state->wordpos] = '\0';
 
 				if (script_word_ingest(state, state->word) != 0) {
+					script_restart(state);
 					return -1;
 				}
 
