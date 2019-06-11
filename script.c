@@ -56,13 +56,6 @@ SCRIPT_DEF_WORD(pop_and_display)
 	LOG_INFO("0x%X", v);
 }
 
-int
-script_state_init(script_state_t *state)
-{
-	state->stackpos = 0;
-	state->wordpos = 0;
-}
-
 void
 script_push(script_state_t *state, uint32_t v) {
 	_STACK(0) = v;
@@ -91,16 +84,45 @@ script_word_info_t script_words_def[] = {
 	_W_ALIAS(pop_and_display, .),
 #undef _W
 #undef _W_ALIAS
+	{"", NULL},
 };
 
+void
+script_add_vocab(script_state_t *state, script_word_info_t *vocab)
+{
+	state->vocab[state->vocabpos] = vocab;
+	state->vocabpos += 1;
+
+	state->vocab[state->vocabpos] = NULL;
+}
+
+int
+script_state_init(script_state_t *state)
+{
+	state->stackpos = 0;
+	state->wordpos = 0;
+	state->vocabpos = 0;
+
+	script_add_vocab(state, script_words_def);
+}
 
 script_word_info_t *
 script_word_lookup(script_state_t *state, const char *s)
 {
-	for (size_t i = 0; i < (sizeof(script_words_def) / sizeof(script_words_def[0])); i ++) {
-		if (strcmp(s, script_words_def[i].name) == 0) {
-			return &script_words_def[i];
+	size_t curvocab = 0;
+
+	while (state->vocab[curvocab] != 0) {
+		size_t curword = 0;
+
+		while (state->vocab[curvocab][curword].code != NULL) {
+			if (strcmp(s, state->vocab[curvocab][curword].name) == 0) {
+				return &state->vocab[curvocab][curword];
+			}
+
+			curword += 1;
 		}
+
+		curvocab += 1;
 	}
 
 	// No match found.
