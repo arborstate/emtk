@@ -76,37 +76,46 @@ script_pop(script_state_t *state) {
 	return _STACK(0);
 }
 
-script_word_t
-script_word_lookup(script_state_t *state, const char *s)
-{
-#define _W_ALIAS(x, alias) if (strcmp(s, #alias) == 0) return script_word_ ## x
+#undef _STACKINC
+#undef _STACK
+
+script_word_info_t script_words_def[] = {
+#define _W_ALIAS(x, alias) { #alias, script_word_ ## x }
 #define _W(x) _W_ALIAS(x, x)
-	_W(dup);
-	_W(drop);
-	_W(swap);
-	_W_ALIAS(add, +);
-	_W_ALIAS(is_zero, 0=);
-	_W_ALIAS(mult, *);
-	_W_ALIAS(pop_and_display, .);
+	_W(dup),
+	_W(drop),
+	_W(swap),
+	_W_ALIAS(add, +),
+	_W_ALIAS(is_zero, 0=),
+	_W_ALIAS(mult, *),
+	_W_ALIAS(pop_and_display, .),
 #undef _W
 #undef _W_ALIAS
+};
+
+
+script_word_info_t *
+script_word_lookup(script_state_t *state, const char *s)
+{
+	for (size_t i = 0; i < (sizeof(script_words_def) / sizeof(script_words_def[0])); i ++) {
+		if (strcmp(s, script_words_def[i].name) == 0) {
+			return &script_words_def[i];
+		}
+	}
 
 	// No match found.
 	return NULL;
 }
 
-#undef _STACKINC
-#undef _STACK
-
 int
 script_word_ingest(script_state_t *state, const char *s)
 {
-	script_word_t w;
+	script_word_info_t *info;
 
-	w = script_word_lookup(state, s);
+	info = script_word_lookup(state, s);
 
-	if (w != NULL) {
-		w(state);
+	if (info != NULL) {
+		info->code(state, info);
 
 		return 0;
 	}
