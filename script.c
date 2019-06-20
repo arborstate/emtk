@@ -12,70 +12,91 @@ script_restart(script_state_t *state)
 {
 	LOG_DEBUG("restarting script environment");
 	state->stackpos = 0;
+	state->rstackpos = 0;
 	state->wordpos = 0;
 }
 
 #define _STACK(pos) state->stack[state->stackpos - pos]
 #define _STACKINC(v) state->stackpos += v
 
-SCRIPT_DEF_WORD(dup)
+SCRIPT_CODE_WORD(dup)
 {
 	_STACK(0) = _STACK(1);
 	_STACKINC(1);
 }
 
-SCRIPT_DEF_WORD(drop)
+SCRIPT_CODE_WORD(drop)
 {
 	_STACKINC(-1);
 }
 
-SCRIPT_DEF_WORD(swap)
+SCRIPT_CODE_WORD(swap)
 {
-	uint32_t a = _STACK(1);
-	uint32_t b = _STACK(2);
+	script_cell_t a = _STACK(1);
+	script_cell_t b = _STACK(2);
 
 	_STACK(1) = b;
 	_STACK(2) = a;
 }
 
-SCRIPT_DEF_WORD(add)
+SCRIPT_CODE_WORD(add)
 {
-	uint32_t v = _STACK(1) + _STACK(2);
+	script_cell_t v = _STACK(1) + _STACK(2);
 
 	_STACKINC(-1);
 	_STACK(1) = v;
 }
 
-SCRIPT_DEF_WORD(is_zero)
+SCRIPT_CODE_WORD(is_zero)
 {
 	_STACK(1) = _STACK(1) == 0 ? -1 : 0;
 }
 
-SCRIPT_DEF_WORD(mult)
+SCRIPT_CODE_WORD(mult)
 {
 	_STACKINC(-1);
 	_STACK(1) = _STACK(1) * _STACK(0);
 }
 
-SCRIPT_DEF_WORD(pop_and_display)
+SCRIPT_CODE_WORD(pop_and_display)
 {
-	uint32_t v = script_pop(state);
+	script_cell_t v = script_pop(state);
 
 	LOG_INFO("0x%X", v);
 }
 
-SCRIPT_DEF_WORD(quit)
+SCRIPT_CODE_WORD(quit)
 {
 	script_restart(state);
 }
 
+SCRIPT_CODE_WORD(enter)
+{
+	state->rstack[state->rstackpos] = state->ip + 1;
+	state->rstackpos += 1;
+
+	state->ip = (script_cell_t *)*state->ip;
+}
+
+SCRIPT_CODE_WORD(exit)
+{
+	state->rstackpos -= 1;
+}
+
+SCRIPT_CODE_WORD(lit)
+{
+	_STACK(0) = *state->ip;
+	_STACKINC(1);
+	state->ip++;
+}
+
 void
-script_push(script_state_t *state, uint32_t v) {
+script_push(script_state_t *state, script_cell_t v) {
 	_STACK(0) = v;
 	_STACKINC(1);
 }
 
-uint32_t
+script_cell_t
 script_pop(script_state_t *state) {
 	_STACKINC(-1);
 
@@ -159,7 +180,7 @@ script_word_ingest(script_state_t *state, const char *s)
 
 	char *endptr;
 
-	uint32_t v = strtol(s, &endptr, 0);
+	script_cell_t v = strtol(s, &endptr, 0);
 
 	if (*endptr == '\0' && errno == 0) {
 		script_push(state, v);
