@@ -65,6 +65,14 @@ SCRIPT_CODE_WORD(pop_and_display)
 	LOG_INFO("0x%X", v);
 }
 
+
+SCRIPT_CODE_WORD(stack_dump)
+{
+	for (size_t i = 0; i < state->stackpos; i++) {
+		LOG_INFO("%d: 0x%X", i, state->stack[i]);
+	}
+}
+
 SCRIPT_CODE_WORD(quit)
 {
 	script_restart(state);
@@ -115,6 +123,7 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(is_zero, 0=),
 	SCRIPT_DICT_WORD_ALIAS(mult, *),
 	SCRIPT_DICT_WORD_ALIAS(pop_and_display, .),
+	SCRIPT_DICT_WORD_ALIAS(stack_dump, .s),
 	SCRIPT_DICT_END
 };
 
