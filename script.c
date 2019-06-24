@@ -91,36 +91,74 @@ SCRIPT_CODE_WORD(mult)
 	_STACK(1) = _STACK(1) * _STACK(0);
 }
 
-SCRIPT_CODE_WORD(pop_and_display)
+static int _cell2str(script_cell_t v, script_cell_t base, char *output, size_t outputlen)
 {
-	script_cell_t v = script_pop(state);
+	// What?
+	if (outputlen < 1) {
+		return 0;
+	}
+
+	// Just Do It
+	if (v == 0) {
+		output[0] = '0';
+		return 1;
+	}
 
 	const char *digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	char buf[(sizeof(script_cell_t) * 8)];
 	size_t i = 0;
 
 	while ((v != 0) && (i < sizeof(buf))) {
-		buf[i] = digits[v % state->base];
-		v = v / state->base;
+		buf[i] = digits[v % base];
+		v = v / base;
 		i++;
 	}
 
-	char output[i + 1];
+	size_t ncopy = i;
+
+	if (ncopy > outputlen) {
+		ncopy = outputlen - 3;
+	}
+
 	size_t j;
-	for (j = 0; j < i; j++) {
+
+	for (j = 0; j < ncopy; j++) {
 		output[j] = buf[i - j - 1];
 	}
 
-	output[j] = '\0';
+	if (ncopy != i) {
+		output[j] = '.';
+		j++;
+		output[j] = '.';
+		j++;
+		output[j] = '.';
+		j++;
+	}
 
-	LOG_INFO("%s", output);
+	return j;
+}
+
+SCRIPT_CODE_WORD(pop_and_display)
+{
+	script_cell_t v = script_pop(state);
+	char buf[(sizeof(script_cell_t) * 8) + 1];
+
+	size_t count = _cell2str(v, state->base, buf, sizeof(buf) - 1);
+	buf[count] = '\0';
+
+	LOG_INFO("%s", buf);
 }
 
 
 SCRIPT_CODE_WORD(stack_dump)
 {
+	char buf[(sizeof(script_cell_t) * 8) + 1];
+	size_t count;
+
 	for (size_t i = 0; i < state->stackpos; i++) {
-		LOG_INFO("%d: 0x%X", i, state->stack[i]);
+		count = _cell2str(state->stack[i], state->base, buf, sizeof(buf) - 1);
+		buf[count] = '\0';
+		LOG_INFO("%d: %s", i, buf);
 	}
 }
 
