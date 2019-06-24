@@ -14,10 +14,43 @@ script_restart(script_state_t *state)
 	state->stackpos = 0;
 	state->rstackpos = 0;
 	state->wordpos = 0;
+
+	state->base = 10;
 }
 
 #define _STACK(pos) state->stack[state->stackpos - pos]
 #define _STACKINC(v) state->stackpos += v
+
+SCRIPT_CODE_WORD(store)
+{
+	script_cell_t *p = (script_cell_t *)_STACK(1);
+	script_cell_t v = _STACK(2);
+	_STACKINC(-2);
+
+	*p = v;
+}
+
+SCRIPT_CODE_WORD(fetch)
+{
+	script_cell_t *p = (script_cell_t *)_STACK(1);
+	_STACK(1) = *p;
+}
+
+
+SCRIPT_CODE_WORD(cstore)
+{
+	uint8_t *p = (uint8_t *)_STACK(1);
+	script_cell_t v = _STACK(2);
+	_STACKINC(-2);
+
+	*p = v;
+}
+
+SCRIPT_CODE_WORD(cfetch)
+{
+	uint8_t *p = (uint8_t *)_STACK(1);
+	_STACK(1) = *p;
+}
 
 SCRIPT_CODE_WORD(dup)
 {
@@ -62,7 +95,25 @@ SCRIPT_CODE_WORD(pop_and_display)
 {
 	script_cell_t v = script_pop(state);
 
-	LOG_INFO("0x%X", v);
+	const char *digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	char buf[(sizeof(script_cell_t) * 8)];
+	size_t i = 0;
+
+	while ((v != 0) && (i < sizeof(buf))) {
+		buf[i] = digits[v % state->base];
+		v = v / state->base;
+		i++;
+	}
+
+	char output[i + 1];
+	size_t j;
+	for (j = 0; j < i; j++) {
+		output[j] = buf[i - j - 1];
+	}
+
+	output[j] = '\0';
+
+	LOG_INFO("%s", output);
 }
 
 
@@ -98,6 +149,12 @@ SCRIPT_CODE_WORD(lit)
 	state->ip++;
 }
 
+SCRIPT_CODE_WORD(base)
+{
+	_STACK(0) = (script_cell_t)&(state->base);
+	_STACKINC(1);
+}
+
 void
 script_push(script_state_t *state, script_cell_t v) {
 	_STACK(0) = v;
@@ -116,6 +173,10 @@ script_pop(script_state_t *state) {
 
 script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(quit),
+	SCRIPT_DICT_WORD_ALIAS(fetch, @),
+	SCRIPT_DICT_WORD_ALIAS(store, !),
+	SCRIPT_DICT_WORD_ALIAS(cfetch, c@),
+	SCRIPT_DICT_WORD_ALIAS(cstore, c!),
 	SCRIPT_DICT_WORD(dup),
 	SCRIPT_DICT_WORD(drop),
 	SCRIPT_DICT_WORD(swap),
@@ -124,6 +185,7 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(mult, *),
 	SCRIPT_DICT_WORD_ALIAS(pop_and_display, .),
 	SCRIPT_DICT_WORD_ALIAS(stack_dump, .s),
+	SCRIPT_DICT_WORD(base),
 	SCRIPT_DICT_END
 };
 
@@ -185,14 +247,14 @@ script_word_ingest(script_state_t *state, const char *s)
 
 	char *endptr;
 
-	script_cell_t v = strtol(s, &endptr, 0);
+	script_cell_t v = strtoul(s, &endptr, state->base);
 
 	if (*endptr == '\0' && errno == 0) {
 		script_push(state, v);
 		return 0;
 	}
 
-	LOG_ERROR("failed to ingest word '%s'", s);
+	LOG_ERROR("failed to ingest word '%s': %s", s, strerror(errno));
 
 	return -1;
 }

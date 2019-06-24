@@ -38,6 +38,8 @@ struct _script_state {
 
 	script_word_info_t *vocab[SCRIPT_MAX_VOCAB];
 	size_t vocabpos;
+
+	script_cell_t base;
 };
 
 typedef struct _script_state script_state_t;
