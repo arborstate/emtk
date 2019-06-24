@@ -2,9 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-
 void
-_log(const char *level, const char *fmt, ...)
+_log(int level, const char *fmt, ...)
 {
 	va_list args;
 

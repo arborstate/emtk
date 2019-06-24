@@ -1,11 +1,18 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-void _log(const char *level, const char *fmt, ...);
+#define LOG_LEVEL_DEBUG 0
+#define LOG_LEVEL_INFO 1
+#define LOG_LEVEL_WARN 2
+#define LOG_LEVEL_ERROR 3
 
-#define LOG_DEBUG(fmt, ...) do { _log("DEBUG", fmt, ##__VA_ARGS__); } while (0)
-#define LOG_INFO(fmt, ...) do { _log("INFO", fmt, ##__VA_ARGS__); } while (0)
-#define LOG_WARN(fmt, ...) do { _log("WARN", fmt, ##__VA_ARGS__); } while (0)
-#define LOG_ERROR(fmt, ...) do { _log("ERROR", fmt, ##__VA_ARGS__); } while (0)
+void _log(int level, const char *fmt, ...);
+void log_set_level(int level);
+const char *log_level_to_str(int level);
+
+#define LOG_DEBUG(fmt, ...) do { _log(LOG_LEVEL_DEBUG, fmt, ##__VA_ARGS__); } while (0)
+#define LOG_INFO(fmt, ...) do { _log(LOG_LEVEL_INFO, fmt, ##__VA_ARGS__); } while (0)
+#define LOG_WARN(fmt, ...) do { _log(LOG_LEVEL_WARN, fmt, ##__VA_ARGS__); } while (0)
+#define LOG_ERROR(fmt, ...) do { _log(LOG_LEVEL_ERROR, fmt, ##__VA_ARGS__); } while (0)
 
 #endif /* __LOG_H__ */
