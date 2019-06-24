@@ -12,6 +12,12 @@ log_set_level(int level)
 	_log_level = level;
 }
 
+int
+log_get_level(void)
+{
+	return _log_level;
+}
+
 const char *log_level_to_str(int level)
 {
 	const char *_level;

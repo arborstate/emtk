@@ -8,6 +8,8 @@
 
 void _log(int level, const char *fmt, ...);
 void log_set_level(int level);
+int log_get_level(void);
+
 const char *log_level_to_str(int level);
 
 #define LOG_DEBUG(fmt, ...) do { _log(LOG_LEVEL_DEBUG, fmt, ##__VA_ARGS__); } while (0)
