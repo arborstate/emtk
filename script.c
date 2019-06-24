@@ -107,19 +107,15 @@ script_pop(script_state_t *state) {
 #undef _STACK
 
 script_word_info_t script_words_def[] = {
-#define _W_ALIAS(x, alias) { #alias, script_word_ ## x }
-#define _W(x) _W_ALIAS(x, x)
-	_W(quit),
-	_W(dup),
-	_W(drop),
-	_W(swap),
-	_W_ALIAS(add, +),
-	_W_ALIAS(is_zero, 0=),
-	_W_ALIAS(mult, *),
-	_W_ALIAS(pop_and_display, .),
-#undef _W
-#undef _W_ALIAS
-	{"", NULL},
+	SCRIPT_DICT_WORD(quit),
+	SCRIPT_DICT_WORD(dup),
+	SCRIPT_DICT_WORD(drop),
+	SCRIPT_DICT_WORD(swap),
+	SCRIPT_DICT_WORD_ALIAS(add, +),
+	SCRIPT_DICT_WORD_ALIAS(is_zero, 0=),
+	SCRIPT_DICT_WORD_ALIAS(mult, *),
+	SCRIPT_DICT_WORD_ALIAS(pop_and_display, .),
+	SCRIPT_DICT_END
 };
 
 void

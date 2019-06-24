@@ -57,6 +57,10 @@ void script_next(script_state_t *state);
 
 #define SCRIPT_CODE_WORD(x) void script_word_ ## x (script_state_t *state, script_word_info_t *info)
 
+#define SCRIPT_DICT_WORD_ALIAS(x, alias) { #alias, script_word_ ## x }
+#define SCRIPT_DICT_WORD(x) SCRIPT_DICT_WORD_ALIAS(x, x)
+#define SCRIPT_DICT_END { "", NULL}
+
 SCRIPT_CODE_WORD(dup);
 SCRIPT_CODE_WORD(drop);
 SCRIPT_CODE_WORD(swap);
