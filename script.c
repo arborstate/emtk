@@ -80,6 +80,14 @@ SCRIPT_CODE_WORD(add)
 	_STACK(1) = v;
 }
 
+SCRIPT_CODE_WORD(sub)
+{
+	script_cell_t v = _STACK(2) - _STACK(1);
+
+	_STACKINC(-1);
+	_STACK(1) = v;
+}
+
 SCRIPT_CODE_WORD(is_zero)
 {
 	_STACK(1) = _STACK(1) == 0 ? -1 : 0;
@@ -90,6 +98,16 @@ SCRIPT_CODE_WORD(mult)
 	_STACKINC(-1);
 	_STACK(1) = _STACK(1) * _STACK(0);
 }
+
+SCRIPT_CODE_WORD(divmod)
+{
+	script_cell_t divisor = _STACK(1);
+	script_cell_t dividend = _STACK(2);
+
+	_STACK(1) = dividend / divisor;
+	_STACK(2) = dividend % divisor;
+}
+
 
 static int _cell2str(script_cell_t v, script_cell_t base, char *output, size_t outputlen)
 {
@@ -219,8 +237,10 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(drop),
 	SCRIPT_DICT_WORD(swap),
 	SCRIPT_DICT_WORD_ALIAS(add, +),
+	SCRIPT_DICT_WORD_ALIAS(sub, -),
 	SCRIPT_DICT_WORD_ALIAS(is_zero, 0=),
 	SCRIPT_DICT_WORD_ALIAS(mult, *),
+	SCRIPT_DICT_WORD_ALIAS(divmod, /mod),
 	SCRIPT_DICT_WORD_ALIAS(pop_and_display, .),
 	SCRIPT_DICT_WORD_ALIAS(stack_dump, .s),
 	SCRIPT_DICT_WORD(base),
