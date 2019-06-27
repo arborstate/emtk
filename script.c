@@ -211,6 +211,91 @@ SCRIPT_CODE_WORD(base)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(here)
+{
+	script_push(state, (script_cell_t)state->here);
+}
+
+SCRIPT_CODE_WORD(comma)
+{
+	script_cell_t v = _STACK(1);
+	_STACKINC(-1);
+
+	script_cell_t *p = (script_cell_t *)state->here;
+
+	*p = v;
+	state->here += sizeof(script_cell_t);
+}
+
+SCRIPT_CODE_WORD(over)
+{
+	_STACK(0) = _STACK(2);
+	_STACKINC(1);
+}
+
+static script_cell_t
+_word_find(script_state_t *state, const char *s, size_t slen)
+{
+	uint8_t *latest = state->latest;
+	while (latest != NULL) {
+		uint8_t *name = latest + sizeof(script_cell_t) + 1;
+		uint8_t count = *(name - 1);
+
+		if (slen == count) {
+			size_t i = 0;
+
+			// See if we match.
+			while (i < count && (s[i] == name[i])) {
+				i += 1;
+			}
+
+			// We found a word.
+			if (i == count) {
+				// This is the XT.
+				return (script_cell_t)SCRIPT_CELL_ALIGN(name + count);
+			}
+		}
+
+		latest = *(uint8_t **)latest;
+	}
+
+        // No match found.
+	return 0;
+}
+
+SCRIPT_CODE_WORD(findxt)
+{
+	script_cell_t count = _STACK(1);
+	const char *s = (const char *)_STACK(2);
+
+	script_cell_t xt = _word_find(state, s, count);
+
+	if (xt != 0) {
+		_STACK(2) = xt;
+		_STACK(1) = SCRIPT_TRUE;
+	} else {
+		_STACKINC(-1);
+		_STACK(1) = SCRIPT_FALSE;
+	}
+}
+
+SCRIPT_CODE_WORD(execute)
+{
+	script_cell_t xt = _STACK(1);
+	_STACKINC(-1);
+
+	script_word_t code = *(script_word_t *)xt;
+	state->param = (script_cell_t *)xt + 1;
+
+	code(state);
+}
+
+SCRIPT_CODE_WORD(docon)
+{
+	_STACK(0) = *state->param;
+	_STACKINC(1);
+}
+
 void
 script_push(script_state_t *state, script_cell_t v) {
 	_STACK(0) = v;
@@ -235,6 +320,7 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(cstore, c!),
 	SCRIPT_DICT_WORD(dup),
 	SCRIPT_DICT_WORD(drop),
+	SCRIPT_DICT_WORD(over),
 	SCRIPT_DICT_WORD(swap),
 	SCRIPT_DICT_WORD_ALIAS(add, +),
 	SCRIPT_DICT_WORD_ALIAS(sub, -),
@@ -244,59 +330,78 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(pop_and_display, .),
 	SCRIPT_DICT_WORD_ALIAS(stack_dump, .s),
 	SCRIPT_DICT_WORD(base),
+	SCRIPT_DICT_WORD(here),
+	{ ",", script_word_comma },
+	SCRIPT_DICT_WORD(findxt),
+	SCRIPT_DICT_WORD(execute),
+	{ "deadbeef", script_word_docon, 0xDEADBEEF },
 	SCRIPT_DICT_END
 };
 
 void
-script_add_vocab(script_state_t *state, script_word_info_t *vocab)
+script_add_words(script_state_t *state, script_word_info_t *vocab)
 {
-	state->vocab[state->vocabpos] = vocab;
-	state->vocabpos += 1;
+	while (vocab->code != NULL) {
+		// Patch in the previous word's info.
+		*(script_cell_t *)state->here = (script_cell_t)state->latest;
 
-	state->vocab[state->vocabpos] = NULL;
+		// Make ourselves the latest.
+		state->latest = (uint8_t *)state->here;
+		state->here += sizeof(script_cell_t);
+
+		// Put down the word's name.
+		uint8_t count = strlen(vocab->name);
+		*(state->here) = count;
+		state->here += 1;
+
+		for (size_t i = 0; i < count; i++) {
+			*state->here = vocab->name[i];
+			state->here += 1;
+		}
+
+		// Align to a cell boundary.
+		state->here = SCRIPT_CELL_ALIGN(state->here);
+
+		// Put down the code address.
+		*(script_cell_t *)state->here = (script_cell_t)vocab->code;
+		state->here += sizeof(script_cell_t);
+
+		// XXX - For code words, this only supports 1 CELL.
+		// Put down the param address.
+		*(script_cell_t *)state->here = vocab->param;
+		state->here += sizeof(script_cell_t);
+
+		vocab++;
+	}
 }
 
 int
-script_state_init(script_state_t *state)
+script_state_init(script_state_t *state, uint8_t *heap)
 {
+	LOG_INFO("word info size %d", sizeof(script_word_info_t));
 	script_restart(state);
-	state->vocabpos = 0;
 
-	script_add_vocab(state, script_words_def);
-}
+	state->heap = heap;
+	state->here = heap;
+	state->latest = NULL;
 
-script_word_info_t *
-script_word_lookup(script_state_t *state, const char *s)
-{
-	size_t curvocab = 0;
-
-	while (state->vocab[curvocab] != 0) {
-		size_t curword = 0;
-
-		while (state->vocab[curvocab][curword].code != NULL) {
-			if (strcmp(s, state->vocab[curvocab][curword].name) == 0) {
-				return &state->vocab[curvocab][curword];
-			}
-
-			curword += 1;
-		}
-
-		curvocab += 1;
-	}
-
-	// No match found.
-	return NULL;
+	script_add_words(state, script_words_def);
+	return 0;
 }
 
 int
 script_word_ingest(script_state_t *state, const char *s)
 {
-	script_word_info_t *info;
+	script_cell_t xt = _word_find(state, s, strlen(s));
 
-	info = script_word_lookup(state, s);
+	if (xt != 0) {
+		// CFA
+		script_word_t code = *(script_word_t *)xt;
 
-	if (info != NULL) {
-		info->code(state, info);
+		// PFA
+		state->param = (script_cell_t *)xt + 1;
+
+		code(state);
 
 		return 0;
 	}

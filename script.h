@@ -6,19 +6,22 @@
 
 #define SCRIPT_MAX_WORD_LEN 32
 #define SCRIPT_STACK_DEPTH 32
-#define SCRIPT_MAX_VOCAB 4
 
-// typedef uint32_t script_cell_t;
-typedef uint64_t script_cell_t;
+#define SCRIPT_TRUE ((script_cell_t)-1)
+#define SCRIPT_FALSE ((script_cell_t)0)
+
+typedef uint32_t script_cell_t;
+// typedef uint64_t script_cell_t;
 
 struct _script_state;
 struct _script_word_info;
 
-typedef void (*script_word_t)(struct _script_state *, struct _script_word_info *);
+typedef void (*script_word_t)(struct _script_state *);
 
 struct _script_word_info {
 	const char *name;
 	script_word_t code;
+	script_cell_t param;
 };
 
 typedef struct _script_word_info script_word_info_t;
@@ -36,32 +39,37 @@ struct _script_state {
 	char word[SCRIPT_MAX_WORD_LEN + 1];
 	size_t wordpos;
 
-	script_word_info_t *vocab[SCRIPT_MAX_VOCAB];
-	size_t vocabpos;
-
 	script_cell_t base;
+
+	uint8_t *heap;
+	uint8_t *here;
+	uint8_t *latest;
+
+	script_cell_t *param;
 };
 
 typedef struct _script_state script_state_t;
 
 
-int script_state_init(script_state_t *state);
-void script_add_vocab(script_state_t *state, script_word_info_t *);
+int script_state_init(script_state_t *state, uint8_t *heap);
+void script_add_words(script_state_t *state, script_word_info_t *vocab);
 
 void script_push(script_state_t *state, script_cell_t v);
 script_cell_t script_pop(script_state_t *state);
-script_word_info_t *script_word_lookup(script_state_t *state, const char *s);
+script_word_t script_word_lookup(script_state_t *state, const char *s);
 int script_word_ingest(script_state_t *state, const char *s);
 int script_eval_str(script_state_t *state, const char *s);
 int script_eval_buf(script_state_t *state, const char *s, size_t len);
 
 void script_next(script_state_t *state);
 
-#define SCRIPT_CODE_WORD(x) void script_word_ ## x (script_state_t *state, script_word_info_t *info)
+#define SCRIPT_CODE_WORD(x) void script_word_ ## x (script_state_t *state)
 
 #define SCRIPT_DICT_WORD_ALIAS(x, alias) { #alias, script_word_ ## x }
 #define SCRIPT_DICT_WORD(x) SCRIPT_DICT_WORD_ALIAS(x, x)
 #define SCRIPT_DICT_END { "", NULL}
+
+#define SCRIPT_CELL_ALIGN(v) (((size_t)(v) % sizeof(script_cell_t)) ? ((v) + (sizeof(script_cell_t) - ((size_t)(v) % sizeof(script_cell_t)))) : (v))
 
 SCRIPT_CODE_WORD(dup);
 SCRIPT_CODE_WORD(drop);

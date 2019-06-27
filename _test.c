@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -14,6 +15,18 @@
 
 int _be_hex_to_uint32(uint8_t *buf, size_t len, uint32_t *ret);
 
+void
+_result(const char *val, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	fprintf(stderr, "%s: ", val);
+	vfprintf(stderr, fmt, args);
+	va_end(args);
+	fprintf(stderr, "\n");
+}
+
 int
 _test_hex(void)
 {
@@ -21,18 +34,18 @@ _test_hex(void)
 	do {								\
 		uint32_t v;						\
 		if (_be_hex_to_uint32(x, strlen(x), &v) < 0) { LOG_ERROR("conversion failed"); return -1; } \
-		if (v != y) { _log("FAIL", "\"" x "\" != " QUOTE(y) " it's 0x%x", v); return -1; } \
-		_log("PASS", "\"" x "\" == " QUOTE(y));		\
+		if (v != y) { _result("FAIL", "\"" x "\" != " QUOTE(y) " it's 0x%x", v); return -1; } \
+		_result("PASS", "\"" x "\" == " QUOTE(y));		\
 	} while (0)
 
 #define _CHECK_NEG(x, y)						\
 	do {								\
 		uint32_t v;						\
 		if (_be_hex_to_uint32(x, strlen(x), &v) >= 0) { \
-			_log("FAIL", "conversion succeeded when it shouldn't"); \
+			_result("FAIL", "conversion succeeded when it shouldn't"); \
  			return -1;					\
 		}							\
-		_log("PASS", "\"" x "\" didn't convert");		\
+		_result("PASS", "\"" x "\" didn't convert");		\
 	} while (0)
 
 	_CHECK_POS("A", 0xa);
@@ -82,8 +95,8 @@ int _resp_hook(slcan_state_t *s, const char *resp) {
 int
 _test_slcan(void)
 {
-#define _CMD_POS(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) < 0) { _log("FAIL", "incorrect return code: %d at %d", ret, __LINE__); return -1 ; }  _log("PASS", "positive case succeeded"); } while (0)
-#define _CMD_NEG(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) >= 0) { _log("FAIL", "incurrent return code : %d at %d", ret, __LINE__); return -1; }  _log("PASS", "negative case failed"); } while (0)
+#define _CMD_POS(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) < 0) { _result("FAIL", "incorrect return code: %d at %d", ret, __LINE__); return -1 ; }  _result("PASS", "positive case succeeded"); } while (0)
+#define _CMD_NEG(cmd) do { if ((ret = slcan_handle_cmd(&s, cmd, strlen(cmd))) >= 0) { _result("FAIL", "incurrent return code : %d at %d", ret, __LINE__); return -1; }  _result("PASS", "negative case failed"); } while (0)
 
 	{
 		int ret;
@@ -117,15 +130,19 @@ _test_script(void)
 {
 #define _W(x) if (script_word_ingest(&state, #x) != 0) return -1
 	script_state_t state;
+	uint8_t heap[1024];
 
-	script_state_init(&state);
+	script_state_init(&state, heap);
+	_W(16);
+	_W(base);
+	_W(!);
 
-	_W(0x1);
+	_W(1);
 
 	_W(dup);
 	_W(+);
 
-	_W(0xDEADBEEF);
+	_W(DEADBEEF);
 
 	_W(swap);
 
