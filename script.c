@@ -13,7 +13,10 @@ script_restart(script_state_t *state)
 	LOG_DEBUG("restarting script environment");
 	state->stackpos = 0;
 	state->rstackpos = 0;
-	state->wordpos = 0;
+
+	state->tib = NULL;
+	state->tibpos = 0;
+	state->tiblen = 0;
 
 	state->base = 10;
 }
@@ -296,6 +299,46 @@ SCRIPT_CODE_WORD(docon)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(parse_name)
+{
+	const char *start = NULL;
+
+	// Skip Leading Spaces
+	while ((state->tibpos < state->tiblen) && isspace(state->tib[state->tibpos])) {
+		state->tibpos += 1;
+	}
+
+	// Mark the starting point.
+	start = state->tib + state->tibpos;
+
+	// Keep going until we get a space.
+	while ((state->tibpos < state->tiblen) && !isspace(state->tib[state->tibpos])) {
+		state->tibpos += 1;
+	}
+
+	// Push the string onto the stack.
+	script_push(state, (script_cell_t)start);
+	script_push(state, (script_cell_t)((state->tib + state->tibpos) - start));
+}
+
+SCRIPT_CODE_WORD(type)
+{
+	size_t count = _STACK(1);
+	const char *s = (const char *)_STACK(2);
+	_STACKINC(-2);
+
+	char buf[count + 1];
+
+	size_t i;
+	for (i = 0; i < count; i++) {
+		buf[i] = *s;
+		s++;
+	}
+
+	buf[i] = '\0';
+	LOG_INFO("%s", buf);
+}
+
 void
 script_push(script_state_t *state, script_cell_t v) {
 	_STACK(0) = v;
@@ -335,6 +378,9 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(findxt),
 	SCRIPT_DICT_WORD(execute),
 	{ "deadbeef", script_word_docon, 0xDEADBEEF },
+	SCRIPT_DICT_WORD(docon),
+	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
+	SCRIPT_DICT_WORD(type),
 	SCRIPT_DICT_END
 };
 
@@ -431,26 +477,37 @@ script_eval_str(script_state_t *state, const char *s)
 int
 script_eval_buf(script_state_t *state, const char *s, size_t len)
 {
-	const char *end = s + len;
+	state->tib = s;
+	state->tiblen = len;
+	state->tibpos = 0;
 
-	while (s < end) {
-		if (isspace(*s)) {
-			if (state->wordpos != 0) {
-				state->word[state->wordpos] = '\0';
+	if (state->tiblen < 1) {
+		return 0;
+	}
 
-				if (script_word_ingest(state, state->word) != 0) {
+	char word[64];
+	size_t wordpos = 0;
+
+	while (state->tibpos < state->tiblen) {
+		if (isspace(state->tib[state->tibpos])) {
+			state->tibpos += 1;
+
+			if (wordpos != 0) {
+				word[wordpos] = '\0';
+
+				if (script_word_ingest(state, word) != 0) {
 					script_restart(state);
 					return -1;
 				}
 
-				state->wordpos = 0;
+				wordpos = 0;
 			}
 		} else {
-			state->word[state->wordpos] = *s;
-			state->wordpos += 1;
-		}
+			word[wordpos] = state->tib[state->tibpos];
+			wordpos++;
 
-		s += 1;
+			state->tibpos += 1;
+		}
 	}
 
 	return 0;

@@ -36,8 +36,9 @@ struct _script_state {
 	script_cell_t *ip;
 	script_cell_t *w;
 
-	char word[SCRIPT_MAX_WORD_LEN + 1];
-	size_t wordpos;
+	const char *tib;
+	size_t tibpos;
+	size_t tiblen;
 
 	script_cell_t base;
 
