@@ -231,6 +231,17 @@ SCRIPT_CODE_WORD(comma)
 	state->here += sizeof(script_cell_t);
 }
 
+SCRIPT_CODE_WORD(char_comma)
+{
+	script_cell_t v = _STACK(1);
+	_STACKINC(-1);
+
+	uint8_t *p = (uint8_t *)state->here;
+
+	*p = v & 0xFF;
+	state->here += sizeof(uint8_t);
+}
+
 SCRIPT_CODE_WORD(over)
 {
 	_STACK(0) = _STACK(2);
@@ -347,6 +358,12 @@ SCRIPT_CODE_WORD(next)
 	code(state);
 }
 
+SCRIPT_CODE_WORD(link)
+{
+	_STACK(0) = (script_cell_t)&state->latest;
+	_STACKINC(1);
+}
+
 void
 script_push(script_state_t *state, script_cell_t v) {
 	_STACK(0) = v;
@@ -383,12 +400,14 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(base),
 	SCRIPT_DICT_WORD(here),
 	{ ",", script_word_comma },
+	{ "c,", script_word_char_comma },
 	SCRIPT_DICT_WORD(findxt),
 	SCRIPT_DICT_WORD(execute),
 	{ "deadbeef", script_word_docon, 0xDEADBEEF },
 	SCRIPT_DICT_WORD(docon),
 	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
 	SCRIPT_DICT_WORD(type),
+	SCRIPT_DICT_WORD(link),
 	SCRIPT_DICT_END
 };
 
