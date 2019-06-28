@@ -10,6 +10,8 @@
 #define SCRIPT_TRUE ((script_cell_t)-1)
 #define SCRIPT_FALSE ((script_cell_t)0)
 
+#define SCRIPT_FLAG_IMMEDIATE (1 << 0)
+
 typedef uint32_t script_cell_t;
 // typedef uint64_t script_cell_t;
 
@@ -22,6 +24,7 @@ struct _script_word_info {
 	const char *name;
 	script_word_t code;
 	script_cell_t param;
+	uint8_t flags;
 	script_cell_t xt;
 };
 
@@ -68,7 +71,7 @@ void script_next(script_state_t *state);
 
 #define SCRIPT_CODE_WORD(x) void script_word_ ## x (script_state_t *state)
 
-#define SCRIPT_DICT_WORD_ALIAS(x, alias) { #alias, script_word_ ## x }
+#define SCRIPT_DICT_WORD_ALIAS(x, alias) { #alias, script_word_ ## x, 0, 0, 0}
 #define SCRIPT_DICT_WORD(x) SCRIPT_DICT_WORD_ALIAS(x, x)
 #define SCRIPT_DICT_END { "", NULL}
 

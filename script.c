@@ -274,8 +274,11 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 
 	uint8_t *latest = state->latest;
 	while (latest != NULL) {
-		uint8_t *name = latest + sizeof(script_cell_t) + 1;
+		uint8_t *name = latest + sizeof(script_cell_t) + 2;
 		uint8_t count = *(name - 1);
+		uint8_t flags = *(name - 2);
+
+		info.flags = flags;
 
 		if (slen == count) {
 			size_t i = 0;
@@ -446,6 +449,10 @@ script_add_words(script_state_t *state, script_word_info_t *vocab)
 		// Make ourselves the latest.
 		state->latest = (uint8_t *)state->here;
 		state->here += sizeof(script_cell_t);
+
+		// Append the flags.
+		*(state->here) = vocab->flags;
+		state->here += 1;
 
 		// Put down the word's name.
 		uint8_t count = strlen(vocab->name);
