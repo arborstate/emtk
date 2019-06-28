@@ -188,12 +188,12 @@ SCRIPT_CODE_WORD(quit)
 	script_restart(state);
 }
 
-SCRIPT_CODE_WORD(enter)
+SCRIPT_CODE_WORD(docol)
 {
 	state->rstack[state->rstackpos] = state->ip + 1;
 	state->rstackpos += 1;
 
-	state->ip = (script_cell_t *)*state->ip;
+	state->ip = (script_cell_t *)state->w + 1;
 }
 
 SCRIPT_CODE_WORD(exit)
@@ -206,7 +206,7 @@ SCRIPT_CODE_WORD(lit)
 {
 	_STACK(0) = *state->ip;
 	_STACKINC(1);
-	state->ip++;
+	state->ip += 1;
 }
 
 SCRIPT_CODE_WORD(base)
@@ -242,15 +242,36 @@ SCRIPT_CODE_WORD(char_comma)
 	state->here += sizeof(uint8_t);
 }
 
+SCRIPT_CODE_WORD(quote_comma)
+{
+	uint8_t count = _STACK(1);
+	const char *s = (const char *)_STACK(2);
+
+	_STACKINC(-2);
+
+	*state->here = count;
+	state->here += 1;
+
+	for (size_t i = 0; i < count; i++) {
+		*state->here = *s;
+		s += 1;
+		state->here += 1;
+	}
+}
+
+
 SCRIPT_CODE_WORD(over)
 {
 	_STACK(0) = _STACK(2);
 	_STACKINC(1);
 }
 
-static script_cell_t
+script_word_info_t
 _word_find(script_state_t *state, const char *s, size_t slen)
 {
+	script_word_info_t info;
+	info.xt = 0;
+
 	uint8_t *latest = state->latest;
 	while (latest != NULL) {
 		uint8_t *name = latest + sizeof(script_cell_t) + 1;
@@ -267,7 +288,8 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 			// We found a word.
 			if (i == count) {
 				// This is the XT.
-				return (script_cell_t)SCRIPT_CELL_ALIGN(name + count);
+				info.xt = (script_cell_t)SCRIPT_CELL_ALIGN(name + count);
+				return info;
 			}
 		}
 
@@ -275,7 +297,7 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 	}
 
         // No match found.
-	return 0;
+	return info;
 }
 
 SCRIPT_CODE_WORD(findxt)
@@ -283,10 +305,10 @@ SCRIPT_CODE_WORD(findxt)
 	script_cell_t count = _STACK(1);
 	const char *s = (const char *)_STACK(2);
 
-	script_cell_t xt = _word_find(state, s, count);
+	script_word_info_t info = _word_find(state, s, count);
 
-	if (xt != 0) {
-		_STACK(2) = xt;
+	if (info.xt != 0) {
+		_STACK(2) = info.xt;
 		_STACK(1) = SCRIPT_TRUE;
 	} else {
 		_STACKINC(-1);
@@ -401,10 +423,13 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(here),
 	{ ",", script_word_comma },
 	{ "c,", script_word_char_comma },
+	{ "\",", script_word_quote_comma },
 	SCRIPT_DICT_WORD(findxt),
 	SCRIPT_DICT_WORD(execute),
 	{ "deadbeef", script_word_docon, 0xDEADBEEF },
 	SCRIPT_DICT_WORD(docon),
+	SCRIPT_DICT_WORD(docol),
+	SCRIPT_DICT_WORD(exit),
 	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
 	SCRIPT_DICT_WORD(type),
 	SCRIPT_DICT_WORD(link),
@@ -466,7 +491,8 @@ script_state_init(script_state_t *state, uint8_t *heap)
 int
 script_word_ingest(script_state_t *state, const char *s)
 {
-	script_cell_t xt = _word_find(state, s, strlen(s));
+	script_word_info_t info = _word_find(state, s, strlen(s));
+	script_cell_t xt = info.xt;
 
 	if (xt != 0) {
 		state->ip = (script_cell_t *)&xt;

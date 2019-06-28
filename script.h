@@ -22,6 +22,7 @@ struct _script_word_info {
 	const char *name;
 	script_word_t code;
 	script_cell_t param;
+	script_cell_t xt;
 };
 
 typedef struct _script_word_info script_word_info_t;
