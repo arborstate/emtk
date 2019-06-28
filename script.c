@@ -199,6 +199,7 @@ SCRIPT_CODE_WORD(enter)
 SCRIPT_CODE_WORD(exit)
 {
 	state->rstackpos -= 1;
+	state->ip = state->rstack[state->rstackpos];
 }
 
 SCRIPT_CODE_WORD(lit)
@@ -284,18 +285,16 @@ SCRIPT_CODE_WORD(findxt)
 
 SCRIPT_CODE_WORD(execute)
 {
-	script_cell_t xt = _STACK(1);
+	state->w = _STACK(1);
 	_STACKINC(-1);
 
-	script_word_t code = *(script_word_t *)xt;
-	state->param = (script_cell_t *)xt + 1;
-
+	script_word_t code = *(script_word_t *)state->w;
 	code(state);
 }
 
 SCRIPT_CODE_WORD(docon)
 {
-	_STACK(0) = *state->param;
+	_STACK(0) = *(((script_cell_t *)state->w) + 1);
 	_STACKINC(1);
 }
 
@@ -337,6 +336,15 @@ SCRIPT_CODE_WORD(type)
 
 	buf[i] = '\0';
 	LOG_INFO("%s", buf);
+}
+
+SCRIPT_CODE_WORD(next)
+{
+	state->w = *state->ip;
+	state->ip += 1;
+
+	script_word_t code = *(script_word_t *)state->w;
+	code(state);
 }
 
 void
@@ -430,6 +438,7 @@ script_state_init(script_state_t *state, uint8_t *heap)
 	state->heap = heap;
 	state->here = heap;
 	state->latest = NULL;
+	state->ip = NULL;
 
 	script_add_words(state, script_words_def);
 	return 0;
@@ -441,13 +450,12 @@ script_word_ingest(script_state_t *state, const char *s)
 	script_cell_t xt = _word_find(state, s, strlen(s));
 
 	if (xt != 0) {
-		// CFA
-		script_word_t code = *(script_word_t *)xt;
+		state->ip = (script_cell_t *)&xt;
 
-		// PFA
-		state->param = (script_cell_t *)xt + 1;
+		do {
+			script_word_next(state);
 
-		code(state);
+		} while (state->rstackpos != 0);
 
 		return 0;
 	}

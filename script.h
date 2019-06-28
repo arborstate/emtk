@@ -34,7 +34,8 @@ struct _script_state {
 	size_t rstackpos;
 
 	script_cell_t *ip;
-	script_cell_t *w;
+	// Current XT
+	script_cell_t w;
 
 	const char *tib;
 	size_t tibpos;
