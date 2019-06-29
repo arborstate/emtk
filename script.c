@@ -19,6 +19,8 @@ script_restart(script_state_t *state)
 	state->tiblen = 0;
 
 	state->base = 10;
+
+	state->compiling = 0;
 }
 
 #define _STACK(pos) state->stack[state->stackpos - pos]
@@ -190,10 +192,18 @@ SCRIPT_CODE_WORD(quit)
 
 SCRIPT_CODE_WORD(docol)
 {
-	state->rstack[state->rstackpos] = state->ip + 1;
+	state->rstack[state->rstackpos] = state->ip;
 	state->rstackpos += 1;
 
 	state->ip = (script_cell_t *)state->w + 1;
+}
+
+SCRIPT_CODE_WORD(append_docol)
+{
+	script_cell_t *here = (script_cell_t *)state->here;
+
+	*here = (script_cell_t)script_word_docol;
+	state->here += sizeof(script_cell_t);
 }
 
 SCRIPT_CODE_WORD(exit)
@@ -389,6 +399,54 @@ SCRIPT_CODE_WORD(link)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(interp_mode)
+{
+	state->compiling = 0;
+}
+
+SCRIPT_CODE_WORD(compile_mode)
+{
+	state->compiling = 1;
+}
+
+SCRIPT_CODE_WORD(align)
+{
+	state->here = SCRIPT_CELL_ALIGN(state->here);
+}
+
+SCRIPT_CODE_WORD(words)
+{
+	script_cell_t *link = (script_cell_t *)state->latest;
+	char buf[64];
+	uint8_t *p;
+
+	while (link != NULL) {
+		p = (uint8_t *)link;
+		p += 4;
+
+		uint8_t flags = *p;
+		p += 1;
+
+		uint8_t count = *p;
+
+		p += 1;
+
+		for (size_t i = 0; i < count; i++) {
+			buf[i] = *p;
+
+			p+= 1;
+		}
+
+		buf[count] = '\0';
+
+		p = SCRIPT_CELL_ALIGN(p);
+		LOG_INFO("link %p xt %p: %s", link, p, buf);
+		link = (script_cell_t *)*link;
+	}
+
+
+
+}
 void
 script_push(script_state_t *state, script_cell_t v) {
 	_STACK(0) = v;
@@ -406,6 +464,7 @@ script_pop(script_state_t *state) {
 #undef _STACK
 
 script_word_info_t script_words_def[] = {
+	SCRIPT_DICT_WORD(lit),
 	SCRIPT_DICT_WORD(quit),
 	SCRIPT_DICT_WORD_ALIAS(fetch, @),
 	SCRIPT_DICT_WORD_ALIAS(store, !),
@@ -432,10 +491,15 @@ script_word_info_t script_words_def[] = {
 	{ "deadbeef", script_word_docon, 0xDEADBEEF },
 	SCRIPT_DICT_WORD(docon),
 	SCRIPT_DICT_WORD(docol),
+	{ "docol,", script_word_append_docol },
 	SCRIPT_DICT_WORD(exit),
 	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
 	SCRIPT_DICT_WORD(type),
 	SCRIPT_DICT_WORD(link),
+	{ "[", script_word_interp_mode, 0, SCRIPT_FLAG_IMMEDIATE, 0},
+	{ "]", script_word_compile_mode, 0, 0, 0},
+	SCRIPT_DICT_WORD(align),
+	SCRIPT_DICT_WORD(words),
 	SCRIPT_DICT_END
 };
 
@@ -498,29 +562,64 @@ script_state_init(script_state_t *state, uint8_t *heap)
 int
 script_word_ingest(script_state_t *state, const char *s)
 {
+	static script_cell_t _lit_xt = 0;
+
 	script_word_info_t info = _word_find(state, s, strlen(s));
 	script_cell_t xt = info.xt;
 
+	// Did we find the word in the dictionary?
 	if (xt != 0) {
-		state->ip = (script_cell_t *)&xt;
+		if (state->compiling && !(info.flags & SCRIPT_FLAG_IMMEDIATE)) {
+			script_cell_t *here = (script_cell_t *)state->here;
+			*here = xt;
+			state->here += sizeof(script_cell_t);
+		} else {
+			state->ip = (script_cell_t *)&xt;
 
-		do {
-			script_word_next(state);
-
-		} while (state->rstackpos != 0);
+			do {
+				script_word_next(state);
+			} while (state->rstackpos != 0);
+		}
 
 		return 0;
 	}
 
-	errno = 0;
+	// Or Is this a number?
+	{
+		errno = 0;
 
-	char *endptr;
+		char *endptr;
 
-	script_cell_t v = strtoul(s, &endptr, state->base);
+		script_cell_t v = strtoul(s, &endptr, state->base);
 
-	if (*endptr == '\0' && errno == 0) {
-		script_push(state, v);
-		return 0;
+		if (*endptr == '\0' && errno == 0) {
+			if (state->compiling) {
+				if (_lit_xt == 0) {
+					const char *lit_name = "lit";
+					script_word_info_t info = _word_find(state, lit_name, strlen(lit_name));
+					_lit_xt = info.xt;
+
+					if (_lit_xt == 0) {
+						LOG_ERROR("failed to find lit xt.");
+						return -1;
+					}
+				}
+
+				script_cell_t *here = (script_cell_t *)state->here;
+				// Append the handler for the literal we want on the stack.
+				*here = _lit_xt;
+				here += 1;
+
+				// Append the actual literal.
+				*here = v;
+				here += 1;
+
+				state->here += sizeof(script_cell_t) * 2;
+			} else {
+				script_push(state, v);
+			}
+			return 0;
+		}
 	}
 
 	LOG_ERROR("failed to ingest word '%s': %s", s, strerror(errno));

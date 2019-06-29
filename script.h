@@ -51,7 +51,7 @@ struct _script_state {
 	uint8_t *here;
 	uint8_t *latest;
 
-	script_cell_t *param;
+	uint8_t compiling;
 };
 
 typedef struct _script_state script_state_t;
