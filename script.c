@@ -190,6 +190,11 @@ SCRIPT_CODE_WORD(quit)
 	script_restart(state);
 }
 
+SCRIPT_CODE_WORD(dovar)
+{
+	script_push(state, (script_cell_t)((script_cell_t *)state->w + 1));
+}
+
 SCRIPT_CODE_WORD(docol)
 {
 	state->rstack[state->rstackpos] = state->ip;
@@ -492,6 +497,7 @@ script_word_info_t script_words_def[] = {
 	{ "deadbeef", script_word_docon, 0xDEADBEEF },
 	SCRIPT_DICT_WORD(docon),
 	SCRIPT_DICT_WORD(docol),
+	SCRIPT_DICT_WORD(dovar),
 	{ "docol,", script_word_append_docol },
 	SCRIPT_DICT_WORD(exit),
 	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
