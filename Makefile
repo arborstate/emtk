@@ -12,6 +12,11 @@ TEST_OBJECTS = $(TEST_SOURCE:.c=.o)
 CLEAN_FILES += $(TEST_OBJECTS)
 TARGETS += _test
 
+SREPL_SOURCE = srepl.c script.c util.c log_stdout.c log.c
+SREPL_OBJECTS = $(SREPL_SOURCE:.c=.o)
+CLEAN_FILES += $(SREPL_OBJECTS)
+TARGETS += srepl
+
 CLEAN_FILES += $(TARGETS)
 
 all: $(TARGETS)
@@ -22,5 +27,7 @@ main: $(MAIN_OBJECTS) slcan.h
 _test: $(TEST_OBJECTS) slcan.h
 	$(CC) $(LDFLAGS) -o $@ $(TEST_OBJECTS)
 
+srepl: $(SREPL_OBJECTS) slcan.h
+	$(CC) $(LDFLAGS) -o $@ $(SREPL_OBJECTS)
 clean:
 	$(RM) $(CLEAN_FILES)
