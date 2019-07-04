@@ -464,6 +464,7 @@ script_pop(script_state_t *state) {
 #undef _STACK
 
 script_word_info_t script_words_def[] = {
+	{ "cell", script_word_docon, sizeof(script_cell_t) },
 	SCRIPT_DICT_WORD(lit),
 	SCRIPT_DICT_WORD(quit),
 	SCRIPT_DICT_WORD_ALIAS(fetch, @),

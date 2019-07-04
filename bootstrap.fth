@@ -4,6 +4,6 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 create : docol, ] create docol, ] exit [
 
 : ' parse-name findxt drop exit [
-: immediate 1 link @ 4 + c! exit [
+: immediate 1 link @ cell + c! exit [
 
 : ; [ ' [ , ] lit [ ' exit , ] , exit [ immediate
