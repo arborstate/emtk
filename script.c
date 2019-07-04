@@ -422,7 +422,7 @@ SCRIPT_CODE_WORD(words)
 
 	while (link != NULL) {
 		p = (uint8_t *)link;
-		p += 4;
+		p += sizeof(script_cell_t);
 
 		uint8_t flags = *p;
 		p += 1;
