@@ -230,6 +230,11 @@ SCRIPT_CODE_WORD(base)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(dp)
+{
+	script_push(state, (script_cell_t)&(state->here));
+}
+
 SCRIPT_CODE_WORD(here)
 {
 	script_push(state, (script_cell_t)state->here);
@@ -470,6 +475,7 @@ script_pop(script_state_t *state) {
 
 script_word_info_t script_words_def[] = {
 	{ "cell", script_word_docon, sizeof(script_cell_t) },
+	SCRIPT_DICT_WORD(dp),
 	SCRIPT_DICT_WORD(lit),
 	SCRIPT_DICT_WORD(quit),
 	SCRIPT_DICT_WORD_ALIAS(fetch, @),
@@ -489,6 +495,7 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(stack_dump, .s),
 	SCRIPT_DICT_WORD(base),
 	SCRIPT_DICT_WORD(here),
+	SCRIPT_DICT_WORD(dp),
 	{ ",", script_word_comma },
 	{ "c,", script_word_char_comma },
 	{ "\",", script_word_quote_comma },

@@ -13,3 +13,5 @@ header : docol, ] header docol, ] exit [
 : constant header lit [ ' docon xt>cfa , ] , , ;
 : create header lit [ ' dovar xt>cfa , ] , ;
 : variable create 0 , ;
+
+: allot dp @ + dp ! ;
