@@ -12,8 +12,11 @@
 
 #define SCRIPT_FLAG_IMMEDIATE (1 << 0)
 
-typedef uint32_t script_cell_t;
-// typedef uint64_t script_cell_t;
+#ifndef SCRIPT_CELL_TYPE
+typedef int script_cell_t;
+#else
+typedef SCRIPT_CELL_TYPE script_cell_t;
+#endif
 
 struct _script_state;
 struct _script_word_info;

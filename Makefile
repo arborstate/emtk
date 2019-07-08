@@ -1,5 +1,5 @@
 
-CFLAGS += -g -I.
+CFLAGS += -g -I. -DSCRIPT_CELL_TYPE=uint64_t
 LDFLAGS += -g
 
 MAIN_SOURCE = main.c slcan.c isotp.c util.c log_stdout.c log.c
