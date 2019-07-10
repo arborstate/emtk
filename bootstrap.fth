@@ -32,8 +32,6 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 : = - 0= ;
 
-hex
-
 : (stash) compile, lit here 0 , ;
 : (if) swap 0= & r> + >r ;
 : if (stash) compile, (if) ; immediate
