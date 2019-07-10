@@ -15,6 +15,7 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : : header docol, ] ;
 
 : ['] lit [ ' lit , ] , ' , ; immediate
+: compile, ['] lit , ' , ['] , , ; immediate
 
 : constant header lit [ ' docon xt>cfa , ] , , ;
 : create header lit [ ' dovar xt>cfa , ] , ;
