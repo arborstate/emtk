@@ -34,16 +34,16 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 hex
 
-: (stash) ['] lit , here 0 , ;
+: (stash) compile, lit here 0 , ;
 : (if) swap 0= & r> + >r ;
-: if (stash) ['] (if) , ; immediate
+: if (stash) compile, (if) ; immediate
 : (patch) here 2 cell * - over -  swap ! ;
 : (else) r> + >r ;
-: else (stash) ['] (else) , swap (patch) ; immediate
+: else (stash) compile, (else) swap (patch) ; immediate
 : then (patch) ; immediate
 
 : begin here ; immediate
 : (again) r> drop >r ;
-: again ['] lit , , ['] (again) , ; immediate
+: again compile, lit , compile, (again) ; immediate
 : (until) swap 0= if r> drop >r exit then drop ;
-: until ['] lit , , ['] (until) , ; immediate
+: until compile, lit , compile, (until) ; immediate
