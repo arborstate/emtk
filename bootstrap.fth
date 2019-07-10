@@ -7,6 +7,8 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : immediate 1 link @ cell + c! ;
 : ' parse-name findxt drop ;
 : xt>cfa @ ;
+: xt>pf cell + ;
+: cells cell * ;
 
 (header) latestxt ' dovar xt>cfa , 0 ,
 : header (header) here latestxt ! ;
