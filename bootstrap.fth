@@ -47,3 +47,6 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : until compile, lit , compile, (until) ; immediate
 : while (stash) compile, (until) ; immediate
 : repeat swap [ ' again , ] here swap ! ; immediate
+
+: 2dup over over ;
+: cmove begin dup while >r over c@ over c! 1 + swap 1 + swap r> 1 - repeat drop drop drop ;
