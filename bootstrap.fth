@@ -21,6 +21,11 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : create header lit [ ' dovar xt>cfa , ] , ;
 : variable create 0 , ;
 
+: noop ;
+: make header docol, compile, lit here 0 , compile, noop compile, exit here swap ! ;
+: (does) latestxt @ xt>pf 2 cells + ! ;
+: does> compile, lit here 0 , compile, (does) compile, exit here swap ! docol, ; immediate
+
 : allot dp @ + dp ! ;
 
 : hex 16 base ! ;
