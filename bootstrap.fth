@@ -12,6 +12,7 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 (header) latestxt ' dovar xt>cfa , 0 ,
 : header (header) here latestxt ! ;
+: : header docol, ] ;
 
 : ['] lit [ ' lit , ] , ' , ; immediate
 
