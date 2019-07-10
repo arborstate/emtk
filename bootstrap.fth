@@ -45,3 +45,5 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : again compile, lit , compile, (again) ; immediate
 : (until) swap 0= if r> drop >r exit then drop ;
 : until compile, lit , compile, (until) ; immediate
+: while (stash) compile, (until) ; immediate
+: repeat swap [ ' again , ] here swap ! ; immediate
