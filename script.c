@@ -499,6 +499,22 @@ SCRIPT_CODE_WORD(and)
 	_STACK(1) = v;
 }
 
+SCRIPT_CODE_WORD(lt)
+{
+	script_cell_t v = _STACK(2) < _STACK(1);
+
+	_STACKINC(-1);
+	_STACK(1) = v;
+}
+
+SCRIPT_CODE_WORD(gt)
+{
+	script_cell_t v = _STACK(2) > _STACK(1);
+
+	_STACKINC(-1);
+	_STACK(1) = v;
+}
+
 void
 script_push(script_state_t *state, script_cell_t v) {
        _STACK(0) = v;
@@ -533,6 +549,8 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(and, &),
 	SCRIPT_DICT_WORD_ALIAS(add, +),
 	SCRIPT_DICT_WORD_ALIAS(sub, -),
+	SCRIPT_DICT_WORD_ALIAS(lt, <),
+	SCRIPT_DICT_WORD_ALIAS(gt, >),
 	SCRIPT_DICT_WORD_ALIAS(is_zero, 0=),
 	SCRIPT_DICT_WORD_ALIAS(mult, *),
 	SCRIPT_DICT_WORD_ALIAS(divmod, /mod),
