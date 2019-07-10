@@ -17,8 +17,7 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : ['] lit [ ' lit , ] , ' , ; immediate
 : compile, ['] lit , ' , ['] , , ; immediate
 
-: noop ;
-: create header docol, compile, lit here 0 , compile, noop compile, exit here swap ! ;
+: create header docol, compile, lit here 0 , compile, exit compile, exit here swap ! ;
 : (does) latestxt @ xt>pf 2 cells + ! ;
 : does> compile, lit here 0 , compile, (does) compile, exit here swap ! docol, ; immediate
 
