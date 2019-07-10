@@ -240,6 +240,25 @@ SCRIPT_CODE_WORD(here)
 	script_push(state, (script_cell_t)state->here);
 }
 
+SCRIPT_CODE_WORD(tib)
+{
+	_STACK(0) = (script_cell_t)state->tib;
+	_STACKINC(1);
+}
+
+
+SCRIPT_CODE_WORD(tiblen)
+{
+	_STACK(0) = (script_cell_t)&(state->tiblen);
+	_STACKINC(1);
+}
+
+SCRIPT_CODE_WORD(tibpos)
+{
+	_STACK(0) = (script_cell_t)&(state->tibpos);
+	_STACKINC(1);
+}
+
 SCRIPT_CODE_WORD(comma)
 {
 	script_cell_t v = _STACK(1);
@@ -520,6 +539,9 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(pop_and_display, .),
 	SCRIPT_DICT_WORD_ALIAS(stack_dump, .s),
 	SCRIPT_DICT_WORD(base),
+	SCRIPT_DICT_WORD_ALIAS(tib, tib),
+	SCRIPT_DICT_WORD_ALIAS(tiblen, #tib),
+	SCRIPT_DICT_WORD_ALIAS(tibpos, in>),
 	SCRIPT_DICT_WORD(here),
 	SCRIPT_DICT_WORD(dp),
 	{ ",", script_word_comma },
