@@ -3,21 +3,23 @@ hex
 : available in> @ #tib @ < ;
 : advance in> @ 1 + in> ! ;
 : cur@ tib in> @ + c@ ;
+: seek-tib true begin available & while cur@ over execute dup if advance then repeat drop ;
+: key available if cur@ advance then ;
 
 : is-delim? 21 < ;
-: not-delim? is-delim? 0= ;
-: seek-tib true begin available & while cur@ over execute dup if advance then repeat drop ;
 : skip-delim ['] is-delim? seek-tib ;
-: gather-word in> @ tib over + swap ['] not-delim? seek-tib in> @ swap - ;
 
-: parse-name skip-delim gather-word ;
-
-: key available if cur@ advance then ;
 : char skip-delim key ;
 : [char] char compile, lit , ; immediate
 
 : not-nl? A = 0= ;
 : // ['] not-nl? seek-tib ;
+
+// Outer Interpreter
+
+: not-delim? is-delim? 0= ;
+: gather-word in> @ tib over + swap ['] not-delim? seek-tib in> @ swap - ;
+: parse-name skip-delim gather-word ;
 
 : check-base dup base @ < ;
 

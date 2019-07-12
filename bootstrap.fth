@@ -10,7 +10,6 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : immediate 1 link @ cell + c! ;
 : is-immediate? cell + c@ 1 & ;
 
-
 : xt>cfa @ ;
 : xt>pf cell + ;
 : cells cell * ;
@@ -34,7 +33,8 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : hex 16 base ! ;
 : decimal 10 base ! ;
 
-: = - 0= ;
+: true 1 ;
+: false 0 ;
 
 : if compile, 0branch here 0 , ; immediate
 : else compile, branch here 0 , swap here swap ! ; immediate
@@ -46,14 +46,12 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : while compile, 0branch here 0 , ; immediate
 : repeat swap compile, branch , here swap ! ; immediate
 
-: 2dup over over ;
-: 2drop drop drop ;
-
-: ?dup dup if dup then ;
 : cmove begin dup while >r over c@ over c! 1 + swap 1 + swap r> 1 - repeat drop drop drop ;
 
-: true 1 ;
-: false 0 ;
+: ?dup dup if dup then ;
+: = - 0= ;
+: 2dup over over ;
+: 2drop drop drop ;
 
 : -rot swap >r swap r> ;
 : rot >r swap r> swap ;
