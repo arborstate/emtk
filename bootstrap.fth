@@ -31,21 +31,15 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 : = - 0= ;
 
-: (stash) compile, lit here 0 , ;
-: (if) swap 0= & r> + >r ;
-: if (stash) compile, (if) ; immediate
-: (patch) here 2 cell * - over -  swap ! ;
-: (else) r> + >r ;
-: else (stash) compile, (else) swap (patch) ; immediate
-: then (patch) ; immediate
+: if compile, 0branch here 0 , ; immediate
+: else compile, branch here 0 , swap here swap ! ; immediate
+: then here swap ! ; immediate
 
 : begin here ; immediate
-: (again) r> drop >r ;
-: again compile, lit , compile, (again) ; immediate
-: (until) swap 0= if r> drop >r exit then drop ;
-: until compile, lit , compile, (until) ; immediate
-: while (stash) compile, (until) ; immediate
-: repeat swap [ ' again , ] here swap ! ; immediate
+: again compile, branch , ; immediate
+: until compile, 0branch , ; immediate
+: while compile, 0branch here 0 , ; immediate
+: repeat swap compile, branch , here swap ! ; immediate
 
 : 2dup over over ;
 : cmove begin dup while >r over c@ over c! 1 + swap 1 + swap r> 1 - repeat drop drop drop ;

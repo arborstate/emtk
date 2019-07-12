@@ -422,6 +422,23 @@ SCRIPT_CODE_WORD(next)
 	code(state);
 }
 
+SCRIPT_CODE_WORD(zero_branch)
+{
+	script_cell_t dest = *state->ip;
+	_STACKINC(-1);
+
+	if (_STACK(0) == 0) {
+		state->ip = (script_cell_t *)dest;
+	} else {
+		state->ip += 1;
+	}
+}
+
+SCRIPT_CODE_WORD(branch)
+{
+	state->ip = (script_cell_t *)*state->ip;
+}
+
 SCRIPT_CODE_WORD(link)
 {
 	_STACK(0) = (script_cell_t)&state->latest;
@@ -559,6 +576,8 @@ script_word_info_t script_words_def[] = {
 	{ "cell", script_word_docon, sizeof(script_cell_t) },
 	SCRIPT_DICT_WORD(dp),
 	SCRIPT_DICT_WORD(lit),
+	SCRIPT_DICT_WORD_ALIAS(zero_branch, 0branch),
+	SCRIPT_DICT_WORD(branch),
 	SCRIPT_DICT_WORD(quit),
 	SCRIPT_DICT_WORD_ALIAS(fetch, @),
 	SCRIPT_DICT_WORD_ALIAS(store, !),
