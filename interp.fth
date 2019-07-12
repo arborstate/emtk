@@ -9,7 +9,7 @@ hex
 : skip-space begin available while cur@ isspace? 0= if exit then advance repeat ;
 : gather-word in> @ tib over + swap 1 begin available & while cur@ isspace? 0= dup if advance then repeat in> @ swap - ;
 
-: parse-word skip-space gather-word ;
+: parse-name skip-space gather-word ;
 
 : key available if cur@ advance then ;
 : char skip-space key ;
@@ -27,8 +27,8 @@ hex
 
 : dispatch-word dup is-immediate? compiling @ 0= | swap nt>xt swap if execute else , then ;
 : dispatch-number 0 -rot >number 2drop compiling @ if compile, lit , then ;
-: process-word
+: process-name
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
 
-: outer begin available while parse-word process-word repeat ;
+: outer begin available while parse-name process-name repeat ;
