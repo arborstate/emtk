@@ -2,12 +2,13 @@ here link @ , 0 c, parse-name (header) ", align
 docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 (header) : docol, ] (header) docol, ] exit [
-: ; [ parse-name [ findxt drop , ] lit exit , exit [ 1 link @ cell + c!
+: nt>xt cell + 1 + dup c@ + 1 + aligned exit [
+: ' parse-name find-nt nt>xt exit [
+
+: ; [ ' [ , ] lit exit , exit [ 1 link @ cell + c!
 
 : immediate 1 link @ cell + c! ;
-: ' parse-name findxt drop ;
 
-: name>int cell + dup c@ + 1 + aligned ;
 
 : xt>cfa @ ;
 : xt>pf cell + ;

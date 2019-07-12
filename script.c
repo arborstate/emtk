@@ -634,7 +634,7 @@ script_word_info_t script_words_def[] = {
 	{ "c,", script_word_char_comma },
 	{ "\",", script_word_quote_comma },
 	SCRIPT_DICT_WORD(findxt),
-	SCRIPT_DICT_WORD_ALIAS(find_name, find-name),
+	SCRIPT_DICT_WORD_ALIAS(find_name, find-nt),
 	SCRIPT_DICT_WORD(execute),
 	{ "deadbeef", script_word_docon, 0xDEADBEEF },
 	SCRIPT_DICT_WORD(docon),
