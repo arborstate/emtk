@@ -6,6 +6,9 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 : immediate 1 link @ cell + c! ;
 : ' parse-name findxt drop ;
+
+: name>int cell + dup c@ + 1 + aligned ;
+
 : xt>cfa @ ;
 : xt>pf cell + ;
 : cells cell * ;
