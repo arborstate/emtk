@@ -16,6 +16,9 @@ hex
 : char skip-delim key ;
 : [char] char compile, lit , ; immediate
 
+: not-nl? A = 0= ;
+: // ['] not-nl? seek-tib ;
+
 : check-base dup base @ < ;
 
 : c>n
