@@ -4,16 +4,16 @@ hex
 : advance in> @ 1 + in> ! ;
 : cur@ tib in> @ + c@ ;
 
-: isspace? 0 over 20 = | over 9 = | over A = | over D = | swap drop ;
-: notspace? isspace? 0= ;
+: is-delim? 21 < ;
+: not-delim? is-delim? 0= ;
 : seek-tib true begin available & while cur@ over execute dup if advance then repeat drop ;
-: skip-space ['] isspace? seek-tib ;
-: gather-word in> @ tib over + swap ['] notspace? seek-tib in> @ swap - ;
+: skip-delim ['] is-delim? seek-tib ;
+: gather-word in> @ tib over + swap ['] not-delim? seek-tib in> @ swap - ;
 
-: parse-name skip-space gather-word ;
+: parse-name skip-delim gather-word ;
 
 : key available if cur@ advance then ;
-: char skip-space key ;
+: char skip-delim key ;
 : [char] char compile, lit , ; immediate
 
 : check-base dup base @ < ;
