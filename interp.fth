@@ -1,13 +1,14 @@
 hex
 
-: isspace? 0 over 20 = | over 9 = | over A = | over D = | swap drop ;
-
 : available in> @ #tib @ < ;
 : advance in> @ 1 + in> ! ;
 : cur@ tib in> @ + c@ ;
 
-: skip-space begin available while cur@ isspace? 0= if exit then advance repeat ;
-: gather-word in> @ tib over + swap 1 begin available & while cur@ isspace? 0= dup if advance then repeat in> @ swap - ;
+: isspace? 0 over 20 = | over 9 = | over A = | over D = | swap drop ;
+: notspace? isspace? 0= ;
+: seek-tib true begin available & while cur@ over execute dup if advance then repeat drop ;
+: skip-space ['] isspace? seek-tib ;
+: gather-word in> @ tib over + swap ['] notspace? seek-tib in> @ swap - ;
 
 : parse-name skip-space gather-word ;
 
