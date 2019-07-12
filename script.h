@@ -28,6 +28,7 @@ struct _script_word_info {
 	script_word_t code;
 	script_cell_t param;
 	uint8_t flags;
+	script_cell_t nt;
 	script_cell_t xt;
 };
 
