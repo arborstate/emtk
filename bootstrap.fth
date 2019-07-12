@@ -47,6 +47,8 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : repeat swap compile, branch , here swap ! ; immediate
 
 : 2dup over over ;
+: 2drop drop drop ;
+
 : ?dup dup if dup then ;
 : cmove begin dup while >r over c@ over c! 1 + swap 1 + swap r> 1 - repeat drop drop drop ;
 
