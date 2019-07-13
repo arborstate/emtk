@@ -536,6 +536,13 @@ SCRIPT_CODE_WORD(rpush)
 	state->rstackpos += 1;
 }
 
+SCRIPT_CODE_WORD(rfetch)
+{
+
+	_STACK(0) = (script_cell_t)state->rstack[state->rstackpos - 1];
+	_STACKINC(1);
+}
+
 SCRIPT_CODE_WORD(and)
 {
 	script_cell_t v = _STACK(1) & _STACK(2);
@@ -613,6 +620,7 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(cstore, c!),
 	SCRIPT_DICT_WORD_ALIAS(rpop, r>),
 	SCRIPT_DICT_WORD_ALIAS(rpush, >r),
+	SCRIPT_DICT_WORD_ALIAS(rfetch, r@),
 	SCRIPT_DICT_WORD(dup),
 	SCRIPT_DICT_WORD(drop),
 	SCRIPT_DICT_WORD(over),
