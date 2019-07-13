@@ -36,15 +36,16 @@ main(void)
 	_script_state.accept = _accept_stdin;
 
 	size_t len;
-	while(1) {
+	while (1) {
 		len = read(0, buf, sizeof(buf) - 1);
-		
+
 		if (len < 0) {
 			LOG_ERROR("error reading stdin: %s", strerror(errno));
 			return len;
 		}
 
 		if (len == 0) {
+
 			return 0;
 		}
 
@@ -54,6 +55,6 @@ main(void)
 		script_eval_buf(&_script_state, buf, len);
 		LOG_INFO("ok");
 	}
-	
+
 	return 0;
 }
