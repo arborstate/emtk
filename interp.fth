@@ -45,4 +45,5 @@ hex
 : ", dup c, here over allot swap cmove ;
 : ." compile, (.") " ", ; immediate
 
-: outer begin available while parse-name process-name repeat ;
+: outer begin available while parse-name process-name repeat ." bok" ;
+: quit begin tib 80 accept #tib ! 0 in> ! outer again ;
