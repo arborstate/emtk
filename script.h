@@ -56,6 +56,8 @@ struct _script_state {
 	uint8_t *latest;
 
 	uint8_t compiling;
+
+	script_word_t accept;
 };
 
 typedef struct _script_state script_state_t;

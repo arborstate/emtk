@@ -591,6 +591,17 @@ SCRIPT_CODE_WORD(gteq)
 	_STACK(1) = v;
 }
 
+SCRIPT_CODE_WORD(accept)
+{
+	if (state->accept) {
+		state->accept(state);
+	} else {
+		// Return nothing.;
+		_STACKINC(-1);
+		_STACK(1) = 0;
+	}
+}
+
 void
 script_push(script_state_t *state, script_cell_t v) {
        _STACK(0) = v;
@@ -665,6 +676,7 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(align),
 	SCRIPT_DICT_WORD(aligned),
 	SCRIPT_DICT_WORD(words),
+	SCRIPT_DICT_WORD(accept),
 	SCRIPT_DICT_END
 };
 
