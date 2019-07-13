@@ -9,6 +9,22 @@
 
 script_state_t _script_state;
 
+void _accept_stdin(script_state_t *state)
+{
+	script_cell_t len = script_pop(state);
+	uint8_t *buf = (uint8_t *)script_pop(state);
+
+	len = read(0, buf, len);
+
+	if (len < 0) {
+		// XXX - This is the wrong thing to do.  We should abort.
+		LOG_ERROR("error reading stdin: %s", strerror(errno));
+		len = 0;
+	}
+
+	script_push(state, len);
+}
+
 int
 main(void)
 {
@@ -16,6 +32,8 @@ main(void)
 	char buf[1024];
 
 	script_state_init(&_script_state, heap);
+
+	_script_state.accept = _accept_stdin;
 
 	size_t len;
 	while(1) {
