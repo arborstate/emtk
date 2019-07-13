@@ -28,7 +28,7 @@ void _accept_stdin(script_state_t *state)
 int
 main(void)
 {
-	uint8_t heap[8192];
+	uint8_t heap[16384];
 	char buf[1024];
 
 	script_state_init(&_script_state, heap);
