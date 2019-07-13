@@ -37,4 +37,12 @@ hex
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
 
+: count dup c@ swap 1 + swap ;
+
+: (.") r> dup count type dup c@ + 1 + >r ;
+: not-quote? [char] " = 0= ;
+: " in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
+: ", dup c, here over allot swap cmove ;
+: ." compile, (.") " ", ; immediate
+
 : outer begin available while parse-name process-name repeat ;
