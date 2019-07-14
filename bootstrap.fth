@@ -28,6 +28,12 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : constant create , does> @ ;
 : variable create 0 , ;
 
+: defer create compile, exit does> @ execute ;
+: deferaddr xt>pf cell + @ ;
+: is ' deferaddr ! ;
+: defer! deferaddr ! ;
+: defer@ deferaddr @ ;
+
 : allot dp @ + dp ! ;
 
 : hex 16 base ! ;
