@@ -31,6 +31,13 @@ hex
 
 : >number begin dup 0 > while over c@ c>n 0= if drop exit then >r rot base @ * r> + -rot 1 - swap 1 + swap repeat ;
 
+: n>c [char] 0 + dup [char] 9 > if lit [ char A char : - , ] + then ;
+: (number>) dup rot begin dup while base @ /mod >r n>c c!+ r> repeat drop over - ;
+: number> (number>) 2dup creverse ;
+
+create pad 50 allot
+: . pad number> type ;
+
 // Outer Interpreter/Compiler
 // --------------------------
 
