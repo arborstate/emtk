@@ -15,14 +15,12 @@ hex
 : not-nl? A = 0= ;
 : // ['] not-nl? seek-tib ;
 
-// Outer Interpreter
-
 : not-delim? is-delim? 0= ;
 : gather-word in> @ tib over + swap ['] not-delim? seek-tib in> @ swap - ;
 : parse-name skip-delim gather-word ;
 
-
 // Number Conversion Routines
+// --------------------------
 : check-base dup base @ < ;
 
 : c>n
@@ -33,20 +31,18 @@ hex
 
 : >number begin dup 0 > while over c@ c>n 0= if drop exit then >r rot base @ * r> + -rot 1 - swap 1 + swap repeat ;
 
-: dispatch-word dup is-immediate? compiling @ 0= | swap nt>xt swap if execute else , then ;
+// Outer Interpreter/Compiler
+// --------------------------
 
-: convert-number 0 -rot >number 2drop ;
-
-// Compilation Loops
-// -----------------
-
-
-// What to call when we ingest a number.
 defer ingest-number
 
 : compile-number compiling @ if compile, lit , then ;
 ' compile-number is ingest-number
+: convert-number 0 -rot >number 2drop ;
 : dispatch-number convert-number ingest-number ;
+
+: dispatch-word dup is-immediate? compiling @ 0= | swap nt>xt swap if execute else , then ;
+
 : process-name
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
@@ -62,6 +58,7 @@ defer ingest-number
 : prompt (.") [ 4 c, 20 c, char o c, char k c, A c, ] ;
 
 : outer begin available while parse-name process-name repeat prompt ;
+
 : quit begin tib 80 accept #tib ! 0 in> ! outer again ;
 
 quit

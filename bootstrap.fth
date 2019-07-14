@@ -52,10 +52,9 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : while compile, 0branch here 0 , ; immediate
 : repeat swap compile, branch , here swap ! ; immediate
 
-: cmove begin dup while >r over c@ over c! 1 + swap 1 + swap r> 1 - repeat drop drop drop ;
-
 : ?dup dup if dup then ;
 : = - 0= ;
+: / /mod swap drop ;
 : 2dup over over ;
 : 2drop drop drop ;
 
@@ -63,4 +62,23 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : rot >r swap r> swap ;
 
 : c!+ over c! 1 + ;
+: c!- over c! 1 - ;
 : c@+ dup c@ swap 1 + swap ;
+
+: cmove begin dup while >r over c@ over c! 1 + swap 1 + swap r> 1 - repeat drop drop drop ;
+: creverse
+    2dup + 1 - swap 2 /
+    begin dup while
+	    1 - >r
+	    2dup
+	    c@ swap
+	    c@ swap
+	    -rot
+	    c!-
+	    -rot
+	    c!+
+	    swap
+	    r>
+    repeat
+    drop drop drop
+;
