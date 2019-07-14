@@ -59,7 +59,9 @@ defer ingest-number
 : ", dup c, here over allot swap cmove ;
 : ." compile, (.") " ", ; immediate
 
-: outer begin available while parse-name process-name repeat ." bok" ;
+: prompt (.") [ 4 c, 20 c, char o c, char k c, A c, ] ;
+
+: outer begin available while parse-name process-name repeat prompt ;
 : quit begin tib 80 accept #tib ! 0 in> ! outer again ;
 
 quit
