@@ -559,6 +559,29 @@ SCRIPT_CODE_WORD(or)
 	_STACK(1) = v;
 }
 
+SCRIPT_CODE_WORD(xor)
+{
+	script_cell_t v = _STACK(1) ^ _STACK(2);
+
+	_STACKINC(-1);
+	_STACK(1) = v;
+}
+
+SCRIPT_CODE_WORD(lshift)
+{
+	script_cell_t v = _STACK(2) << _STACK(1);
+
+	_STACKINC(-1);
+	_STACK(1) = v;
+}
+
+SCRIPT_CODE_WORD(rshift)
+{
+	script_cell_t v = _STACK(2) >> _STACK(1);
+
+	_STACKINC(-1);
+	_STACK(1) = v;
+}
 SCRIPT_CODE_WORD(lt)
 {
 	script_cell_t v = _STACK(2) < _STACK(1);
@@ -638,8 +661,11 @@ script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(swap),
 	SCRIPT_DICT_WORD_ALIAS(and, &),
 	SCRIPT_DICT_WORD_ALIAS(or, |),
+	SCRIPT_DICT_WORD_ALIAS(xor, ^),
 	SCRIPT_DICT_WORD_ALIAS(add, +),
 	SCRIPT_DICT_WORD_ALIAS(sub, -),
+	SCRIPT_DICT_WORD_ALIAS(lshift, <<),
+	SCRIPT_DICT_WORD_ALIAS(rshift, >>),
 	SCRIPT_DICT_WORD_ALIAS(lt, <),
 	SCRIPT_DICT_WORD_ALIAS(lteq, <=),
 	SCRIPT_DICT_WORD_ALIAS(gt, >),
