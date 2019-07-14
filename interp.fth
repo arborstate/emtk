@@ -55,9 +55,11 @@ defer ingest-number
 
 : (.") r> dup count type dup c@ + 1 + >r ;
 : not-quote? [char] " = 0= ;
-: " in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
+: " skip-delim in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
 : ", dup c, here over allot swap cmove ;
 : ." compile, (.") " ", ; immediate
 
 : outer begin available while parse-name process-name repeat ." bok" ;
 : quit begin tib 80 accept #tib ! 0 in> ! outer again ;
+
+quit
