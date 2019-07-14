@@ -58,6 +58,7 @@ struct _script_state {
 	uint8_t compiling;
 
 	script_word_t accept;
+	script_word_t type;
 };
 
 typedef struct _script_state script_state_t;

@@ -420,20 +420,24 @@ SCRIPT_CODE_WORD(parse_name)
 
 SCRIPT_CODE_WORD(type)
 {
-	size_t count = _STACK(1);
-	const char *s = (const char *)_STACK(2);
-	_STACKINC(-2);
+	if (state->type) {
+		state->type(state);
+	} else {
+		size_t count = _STACK(1);
+		const char *s = (const char *)_STACK(2);
+		_STACKINC(-2);
 
-	char buf[count + 1];
+		char buf[count + 1];
 
-	size_t i;
-	for (i = 0; i < count; i++) {
-		buf[i] = *s;
-		s++;
+		size_t i;
+		for (i = 0; i < count; i++) {
+			buf[i] = *s;
+			s++;
+		}
+
+		buf[i] = '\0';
+		LOG_INFO("%s", buf);
 	}
-
-	buf[i] = '\0';
-	LOG_INFO("%s", buf);
 }
 
 SCRIPT_CODE_WORD(next)
