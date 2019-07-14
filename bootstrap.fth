@@ -61,3 +61,6 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 : -rot swap >r swap r> ;
 : rot >r swap r> swap ;
+
+: c!+ over c! 1 + ;
+: c@+ dup c@ swap 1 + swap ;
