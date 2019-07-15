@@ -40,6 +40,7 @@ docol, ] dp @ link @ , 0 c, parse-name ", align link ! exit [ link !
 
 : = - 0= ;
 : / /mod swap drop ;
+: min 2dup > if swap then drop ;
 
 
 // Complex Word Defining
