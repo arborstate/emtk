@@ -45,12 +45,13 @@ create pad 50 allot
 // String Handling
 // ---------------
 
-: count dup c@ swap 1 + swap ;
-: (.") r> dup count type dup c@ + 1 + >r ;
 : not-quote? [char] " = 0= ;
 : " skip-delim in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
 : ", dup c, here over allot swap cmove ;
-: ." compile, (.") " ", ; immediate
+: count dup c@ swap 1 + swap ;
+: (c") r> dup dup c@ + 1 + >r count ;
+: ," compile, (c") " ", ; immediate
+: ." [ ' ," , ] compile, type ; immediate
 
 // Outer Interpreter/Compiler
 // --------------------------
