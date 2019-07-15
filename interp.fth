@@ -56,9 +56,6 @@ hex
 create pad 50 allot
 : . pad number> type ;
 
-
-
-
 // Error Handlings
 // ---------------
 defer abort
