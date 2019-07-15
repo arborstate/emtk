@@ -375,6 +375,13 @@ SCRIPT_CODE_WORD(docon)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(comment_line)
+{
+	while ((state->tibpos < state->tiblen) && state->tib[state->tibpos] != '\n') {
+		state->tibpos += 1;
+	}
+}
+
 SCRIPT_CODE_WORD(parse_name)
 {
 	const char *start = NULL;
@@ -630,6 +637,7 @@ script_pop(script_state_t *state) {
 #undef _STACK
 
 const script_word_info_t script_words_def[] = {
+	{ "//", script_word_comment_line },
 	{ "cell", script_word_docon, sizeof(script_cell_t) },
 	SCRIPT_DICT_WORD(dp),
 	SCRIPT_DICT_WORD(lit),
