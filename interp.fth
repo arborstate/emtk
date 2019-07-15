@@ -81,7 +81,13 @@ defer ingest-number
 
 : compile-number compiling @ if compile, lit , then ;
 ' compile-number is ingest-number
-: convert-number 0 -rot >number dup 0 > if ." failed to ingest number: " type abort else 2drop then ;
+
+: determine-base 2dup ["] 0x" is-prefix? if 2 "+ 10 else base @ then ;
+: convert-number
+    base @ >r determine-base base !
+    0 -rot >number
+    dup 0 > if ." failed to ingest number: " type abort else 2drop then
+    r> base ! ;
 : dispatch-number convert-number ingest-number ;
 
 : dispatch-word dup is-immediate? compiling @ 0= | swap nt>xt swap if execute else , then ;
