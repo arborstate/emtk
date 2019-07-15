@@ -1,5 +1,9 @@
-here link @ , 0 c, parse-name (header) ", align
-docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
+// Let's start at the beginning...
+
+// Word Defining / Dictionary Access
+// ---------------------------------
+dp @ link @ , 0 c, parse-name (header) ", align
+docol, ] dp @ link @ , 0 c, parse-name ", align link ! exit [ link !
 
 (header) : docol, ] (header) docol, ] exit [
 : nt>xt cell + 1 + dup c@ + 1 + aligned exit [
@@ -9,6 +13,9 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 : immediate 1 link @ cell + c! ;
 : is-immediate? cell + c@ 1 & ;
+
+: here dp @ ;
+: allot dp @ + dp ! ;
 
 : xt>cfa @ ;
 : xt>pf cell + ;
@@ -20,6 +27,23 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 
 : ['] lit [ ' lit , ] , ' , ; immediate
 : compile, ['] lit , ' , ['] , , ; immediate
+
+
+// Helpers
+// -------
+
+: hex 16 base ! ;
+: decimal 10 base ! ;
+
+: true 1 ;
+: false 0 ;
+
+: = - 0= ;
+: / /mod swap drop ;
+
+
+// Complex Word Defining
+// ---------------------
 
 : create header docol, compile, lit here 0 , compile, exit compile, exit here swap ! ;
 : (does) latestxt @ xt>pf 2 cells + ! ;
@@ -34,14 +58,9 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : defer! deferaddr ! ;
 : defer@ deferaddr @ ;
 
-: allot dp @ + dp ! ;
 
-: hex 16 base ! ;
-: decimal 10 base ! ;
-
-: true 1 ;
-: false 0 ;
-
+// Conditionals And Looping Constructs
+// -----------------------------------
 : if compile, 0branch here 0 , ; immediate
 : else compile, branch here 0 , swap here swap ! ; immediate
 : then here swap ! ; immediate
@@ -52,15 +71,19 @@ docol, ] here link @ , 0 c, parse-name ", align link ! exit [ link !
 : while compile, 0branch here 0 , ; immediate
 : repeat swap compile, branch , here swap ! ; immediate
 
+
+// Extended Stack Manipulation
+// ---------------------------
 : ?dup dup if dup then ;
-: = - 0= ;
-: / /mod swap drop ;
 : 2dup over over ;
 : 2drop drop drop ;
 
 : -rot swap >r swap r> ;
 : rot >r swap r> swap ;
 
+
+// Character Memory Access
+// -----------------------
 : c!+ over c! 1 + ;
 : c!- over c! 1 - ;
 : c@+ dup c@ swap 1 + swap ;
