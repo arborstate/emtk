@@ -69,7 +69,7 @@ defer ingest-number
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
 
-: prompt (.") [ 4 c, 20 c, char o c, char k c, A c, ] ;
+: prompt (c") [ 4 c, 20 c, char o c, char k c, A c, ] type ;
 
 : outer begin available while parse-name process-name repeat prompt ;
 
