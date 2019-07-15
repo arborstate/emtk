@@ -50,8 +50,9 @@ create pad 50 allot
 : ", dup c, here over allot swap cmove ;
 : count dup c@ swap 1 + swap ;
 : (c") r> dup dup c@ + 1 + >r count ;
-: ," compile, (c") " ", ; immediate
-: ." [ ' ," , ] compile, type ; immediate
+: ["] compile, (c") " ", ; immediate
+: ." [ ' ["] , ] compile, type ; immediate
+
 
 // Error Handlings
 // ---------------
