@@ -7,8 +7,7 @@
 #include "log.h"
 #include "script.h"
 
-void
-script_restart(script_state_t *state)
+SCRIPT_CODE_WORD(restart)
 {
 	LOG_DEBUG("restarting script environment");
 	state->stackpos = 0;
@@ -183,11 +182,6 @@ SCRIPT_CODE_WORD(stack_dump)
 		buf[count] = '\0';
 		LOG_INFO("%d: %s", i, buf);
 	}
-}
-
-SCRIPT_CODE_WORD(quit)
-{
-	script_restart(state);
 }
 
 SCRIPT_CODE_WORD(dovar)
@@ -637,13 +631,13 @@ script_pop(script_state_t *state) {
 #undef _STACK
 
 const script_word_info_t script_words_def[] = {
+	SCRIPT_DICT_WORD(restart),
 	{ "//", script_word_comment_line },
 	{ "cell", script_word_docon, sizeof(script_cell_t) },
 	SCRIPT_DICT_WORD(dp),
 	SCRIPT_DICT_WORD(lit),
 	SCRIPT_DICT_WORD_ALIAS(zero_branch, 0branch),
 	SCRIPT_DICT_WORD(branch),
-	SCRIPT_DICT_WORD(quit),
 	SCRIPT_DICT_WORD_ALIAS(fetch, @),
 	SCRIPT_DICT_WORD_ALIAS(store, !),
 	SCRIPT_DICT_WORD_ALIAS(cfetch, c@),
@@ -745,7 +739,7 @@ int
 script_state_init(script_state_t *state, uint8_t *heap)
 {
 	LOG_INFO("word info size %d", sizeof(script_word_info_t));
-	script_restart(state);
+	script_word_restart(state);
 
 	state->heap = heap;
 	state->here = heap;
@@ -852,7 +846,7 @@ script_eval_buf(script_state_t *state, const char *s, size_t len)
 				word[wordpos] = '\0';
 
 				if (script_word_ingest(state, word) != 0) {
-					script_restart(state);
+					script_word_restart(state);
 					return -1;
 				}
 
