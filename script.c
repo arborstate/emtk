@@ -349,22 +349,6 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 	return info;
 }
 
-SCRIPT_CODE_WORD(findxt)
-{
-	script_cell_t count = _STACK(1);
-	const char *s = (const char *)_STACK(2);
-
-	script_word_info_t info = _word_find(state, s, count);
-
-	if (info.xt != 0) {
-		_STACK(2) = info.xt;
-		_STACK(1) = SCRIPT_TRUE;
-	} else {
-		_STACKINC(-1);
-		_STACK(1) = SCRIPT_FALSE;
-	}
-}
-
 SCRIPT_CODE_WORD(find_name)
 {
 	script_cell_t count = _STACK(1);
@@ -695,7 +679,6 @@ const script_word_info_t script_words_def[] = {
 	{ ",", script_word_comma },
 	{ "c,", script_word_char_comma },
 	{ "\",", script_word_quote_comma },
-	SCRIPT_DICT_WORD(findxt),
 	SCRIPT_DICT_WORD_ALIAS(find_name, find-nt),
 	SCRIPT_DICT_WORD(execute),
 	{ "deadbeef", script_word_docon, 0xDEADBEEF },
