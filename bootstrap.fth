@@ -28,21 +28,6 @@ docol, ] dp @ link @ , 0 c, parse-name ", align link ! exit [ link !
 : ['] lit [ ' lit , ] , ' , ; immediate
 : compile, ['] lit , ' , ['] , , ; immediate
 
-
-// Helpers
-// -------
-
-: hex 16 base ! ;
-: decimal 10 base ! ;
-
-: true 1 ;
-: false 0 ;
-
-: = - 0= ;
-: / /mod swap drop ;
-: min 2dup > if swap then drop ;
-
-
 // Complex Word Defining
 // ---------------------
 
@@ -82,6 +67,19 @@ docol, ] dp @ link @ , 0 c, parse-name ", align link ! exit [ link !
 : -rot swap >r swap r> ;
 : rot >r swap r> swap ;
 
+
+// Helpers
+// -------
+
+: hex 16 base ! ;
+: decimal 10 base ! ;
+
+: true 1 ;
+: false 0 ;
+
+: = - 0= ;
+: / /mod swap drop ;
+: min 2dup > if swap then drop ;
 
 // Character Memory Access
 // -----------------------
