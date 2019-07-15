@@ -1,18 +1,16 @@
-hex
-
 : available in> @ #tib @ < ;
 : advance in> @ 1 + in> ! ;
 : cur@ tib in> @ + c@ ;
 : seek-tib true begin available & while cur@ over execute dup if advance then repeat drop ;
 : key available if cur@ advance then ;
 
-: is-delim? 21 < ;
+: is-delim? 33 < ;
 : skip-delim ['] is-delim? seek-tib ;
 
 : char skip-delim key ;
 : [char] char compile, lit , ; immediate
 
-: not-nl? A = 0= ;
+: not-nl? 10 = 0= ;
 : // ['] not-nl? seek-tib ;
 
 : not-delim? is-delim? 0= ;
@@ -51,7 +49,7 @@ hex
 : c>n
     dup [char] 0 >= over [char] 9 <= & if [char] 0 - check-base exit then
     dup [char] a >= if lit [ char a char A - , ] - then
-    dup [char] A >= over [char] Z <= & if [char] A - A + check-base exit then
+    dup [char] A >= over [char] Z <= & if [char] A - 10 + check-base exit then
     false ;
 
 : >number begin dup 0 > while
@@ -64,7 +62,7 @@ hex
 : (number>) dup rot begin dup while base @ /mod >r n>c c!+ r> repeat drop over - ;
 : number> (number>) 2dup creverse ;
 
-create pad 50 allot
+create pad 80 allot
 : . pad number> type ;
 
 // Error Handlings
@@ -82,7 +80,7 @@ defer ingest-number
 : compile-number compiling @ if compile, lit , then ;
 ' compile-number is ingest-number
 
-: determine-base 2dup ["] 0x" is-prefix? if 2 "+ 10 else base @ then ;
+: determine-base 2dup ["] 0x" is-prefix? if 2 "+ 16 else base @ then ;
 : convert-number
     base @ >r determine-base base !
     0 -rot >number
@@ -96,7 +94,7 @@ defer ingest-number
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
 
-: prompt (c") [ 4 c, 20 c, char o c, char k c, A c, ] type ;
+: prompt (c") [ 4 c, 32 c, char o c, char k c, 10 c, ] type ;
 
 : outer begin available while parse-name process-name repeat prompt ;
 
