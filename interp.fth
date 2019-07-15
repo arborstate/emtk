@@ -32,6 +32,17 @@ hex
 : ." [ ' ["] , ] compile, type ; immediate
 : "+ >r dup if r@ - swap r@ + swap then r> drop ;
 
+: is-prefix?
+    swap -rot min
+    begin dup
+    while
+	    >r 2dup c@ swap c@ -
+	    if r> drop 2drop false exit then
+	    1 + swap 1 + swap
+	    r> 1 -
+    repeat
+    drop 2drop true ;
+
 
 // Number Conversion Routines
 // --------------------------
