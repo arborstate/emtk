@@ -38,6 +38,16 @@ hex
 create pad 50 allot
 : . pad number> type ;
 
+// String Handling
+// ---------------
+
+: count dup c@ swap 1 + swap ;
+: (.") r> dup count type dup c@ + 1 + >r ;
+: not-quote? [char] " = 0= ;
+: " skip-delim in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
+: ", dup c, here over allot swap cmove ;
+: ." compile, (.") " ", ; immediate
+
 // Outer Interpreter/Compiler
 // --------------------------
 
@@ -53,14 +63,6 @@ defer ingest-number
 : process-name
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
-
-: count dup c@ swap 1 + swap ;
-
-: (.") r> dup count type dup c@ + 1 + >r ;
-: not-quote? [char] " = 0= ;
-: " skip-delim in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
-: ", dup c, here over allot swap cmove ;
-: ." compile, (.") " ", ; immediate
 
 : prompt (.") [ 4 c, 20 c, char o c, char k c, A c, ] ;
 
