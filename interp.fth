@@ -53,6 +53,13 @@ create pad 50 allot
 : ," compile, (c") " ", ; immediate
 : ." [ ' ," , ] compile, type ; immediate
 
+// Error Handlings
+// ---------------
+defer abort
+' restart ' abort defer!
+
+: abort" [ ' ." , ] compile, abort ; immediate
+
 // Outer Interpreter/Compiler
 // --------------------------
 
