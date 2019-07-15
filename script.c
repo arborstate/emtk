@@ -681,7 +681,6 @@ const script_word_info_t script_words_def[] = {
 	{ "\",", script_word_quote_comma },
 	SCRIPT_DICT_WORD_ALIAS(find_name, find-nt),
 	SCRIPT_DICT_WORD(execute),
-	{ "deadbeef", script_word_docon, 0xDEADBEEF },
 	SCRIPT_DICT_WORD(docon),
 	SCRIPT_DICT_WORD(docol),
 	SCRIPT_DICT_WORD(dovar),
