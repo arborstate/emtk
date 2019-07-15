@@ -650,7 +650,7 @@ script_pop(script_state_t *state) {
 #undef _STACKINC
 #undef _STACK
 
-script_word_info_t script_words_def[] = {
+const script_word_info_t script_words_def[] = {
 	{ "cell", script_word_docon, sizeof(script_cell_t) },
 	SCRIPT_DICT_WORD(dp),
 	SCRIPT_DICT_WORD(lit),
@@ -717,7 +717,7 @@ script_word_info_t script_words_def[] = {
 };
 
 void
-script_add_words(script_state_t *state, script_word_info_t *vocab)
+script_add_words(script_state_t *state, const script_word_info_t *vocab)
 {
 	while (vocab->code != NULL) {
 		// Patch in the previous word's info.
