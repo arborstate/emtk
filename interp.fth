@@ -19,6 +19,20 @@ hex
 : gather-word in> @ tib over + swap ['] not-delim? seek-tib in> @ swap - ;
 : parse-name skip-delim gather-word ;
 
+
+// String Handling
+// ---------------
+
+: not-quote? [char] " = 0= ;
+: " skip-delim in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
+: ", dup c, here over allot swap cmove ;
+: count dup c@ swap 1 + swap ;
+: (c") r> dup dup c@ + 1 + >r count ;
+: ["] compile, (c") " ", ; immediate
+: ." [ ' ["] , ] compile, type ; immediate
+: "+ >r dup if r@ - swap r@ + swap then r> drop ;
+
+
 // Number Conversion Routines
 // --------------------------
 : check-base dup base @ < ;
@@ -42,16 +56,7 @@ hex
 create pad 50 allot
 : . pad number> type ;
 
-// String Handling
-// ---------------
 
-: not-quote? [char] " = 0= ;
-: " skip-delim in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
-: ", dup c, here over allot swap cmove ;
-: count dup c@ swap 1 + swap ;
-: (c") r> dup dup c@ + 1 + >r count ;
-: ["] compile, (c") " ", ; immediate
-: ." [ ' ["] , ] compile, type ; immediate
 
 
 // Error Handlings
