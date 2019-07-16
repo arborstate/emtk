@@ -6,11 +6,9 @@ dp @ link @ , 0 c, parse-name (header) ", align
 docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
 
 (header) : docol, ] (header) docol, ] exit [ latest @ link !
-: nt>xt cell + 1 + dup c@ + 1 + aligned exit [ latest @ link !
-: ' parse-name find-nt nt>xt exit [ latest @ link !
 
-: ; [ ' [ , ] lit exit , latest @ link ! exit [ latest @ link ! 1 link @ cell + c!
-
+: ; [ parse-name [ find-nt cell + 1 + dup c@ + 1 + aligned , ]
+lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 
 // Dictionary Helpers
 // ------------------
@@ -20,14 +18,18 @@ docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
 : here dp @ ;
 : allot dp @ + dp ! ;
 
+: nt>xt cell + 1 + dup c@ + 1 + aligned ;
 : xt>cfa @ ;
 : xt>pf cell + ;
 : cells cell * ;
 
+: ' parse-name find-nt nt>xt ;
 : ['] lit [ ' lit , ] , ' , ; immediate
 : compile, ['] lit , ' , ['] , , ; immediate
 : postpone ' , ; immediate
 
+// High-Level Word Creation
+// ------------------------
 : header here latest ! link @ , 0 c, parse-name ", align ;
 : : header docol, ] ;
 : ; postpone [ compile, exit latest @ link ! ; immediate
