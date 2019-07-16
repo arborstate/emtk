@@ -50,6 +50,7 @@ lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 : defer! deferaddr ! ;
 : defer@ deferaddr @ ;
 
+: marker create link @ , here cell + , does> dup @ link ! cell + @ dp ! ;
 
 // Conditionals And Looping Constructs
 // -----------------------------------
