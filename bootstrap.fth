@@ -14,7 +14,7 @@ docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
 
 // Dictionary Helpers
 // ------------------
-: immediate 1 link @ cell + c! ;
+: immediate 1 latest @ cell + c! ;
 : is-immediate? cell + c@ 1 & ;
 
 : here dp @ ;
