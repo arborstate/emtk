@@ -54,6 +54,7 @@ struct _script_state {
 	uint8_t *heap;
 	uint8_t *here;
 	uint8_t *link;
+	uint8_t *latest;
 
 	uint8_t compiling;
 

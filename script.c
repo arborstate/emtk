@@ -452,6 +452,12 @@ SCRIPT_CODE_WORD(link)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(latest)
+{
+	_STACK(0) = (script_cell_t)&state->latest;
+	_STACKINC(1);
+}
+
 SCRIPT_CODE_WORD(interp_mode)
 {
 	state->compiling = 0;
@@ -685,6 +691,7 @@ const script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
 	SCRIPT_DICT_WORD(type),
 	SCRIPT_DICT_WORD(link),
+	SCRIPT_DICT_WORD(latest),
 	{ "[", script_word_interp_mode, 0, SCRIPT_FLAG_IMMEDIATE, 0},
 	{ "]", script_word_compile_mode, 0, 0, 0},
 	SCRIPT_DICT_WORD(align),
@@ -745,6 +752,7 @@ script_state_init(script_state_t *state, uint8_t *heap)
 	state->heap = heap;
 	state->here = heap;
 	state->link = NULL;
+	state->latest = NULL;
 	state->ip = NULL;
 
 	script_add_words(state, script_words_def);
