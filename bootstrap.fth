@@ -26,7 +26,11 @@ docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
 
 : ['] lit [ ' lit , ] , ' , ; immediate
 : compile, ['] lit , ' , ['] , , ; immediate
+: postpone ' , ; immediate
 
+: header here latest ! link @ , 0 c, parse-name ", align ;
+: : header docol, ] ;
+: ; postpone [ compile, exit latest @ link ! ; immediate
 
 // Complex Word Defining
 // ---------------------
