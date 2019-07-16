@@ -31,7 +31,9 @@
 : "+ >r dup if r@ - swap r@ + swap then r> drop ;
 
 : is-prefix?
-    swap -rot min
+    swap -rot
+    2dup < if 2drop 2drop false exit then
+    min
     begin dup
     while
 	    >r 2dup c@ swap c@ -
