@@ -305,9 +305,9 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 {
 	script_word_info_t info = {0};
 
-	uint8_t *latest = state->latest;
-	while (latest != NULL) {
-		uint8_t *name = latest + sizeof(script_cell_t) + 2;
+	uint8_t *link = state->link;
+	while (link != NULL) {
+		uint8_t *name = link + sizeof(script_cell_t) + 2;
 		uint8_t count = *(name - 1);
 		uint8_t flags = *(name - 2);
 
@@ -325,13 +325,13 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 			if (i == count) {
 				// This is the XT.
 				info.xt = (script_cell_t)SCRIPT_CELL_ALIGN(name + count);
-				info.nt = (script_cell_t)latest;
+				info.nt = (script_cell_t)link;
 
 				return info;
 			}
 		}
 
-		latest = *(uint8_t **)latest;
+		link = *(uint8_t **)link;
 	}
 
         // No match found.
@@ -448,7 +448,7 @@ SCRIPT_CODE_WORD(branch)
 
 SCRIPT_CODE_WORD(link)
 {
-	_STACK(0) = (script_cell_t)&state->latest;
+	_STACK(0) = (script_cell_t)&state->link;
 	_STACKINC(1);
 }
 
@@ -474,7 +474,7 @@ SCRIPT_CODE_WORD(aligned)
 
 SCRIPT_CODE_WORD(words)
 {
-	script_cell_t *link = (script_cell_t *)state->latest;
+	script_cell_t *link = (script_cell_t *)state->link;
 	char buf[64];
 	uint8_t *p;
 
@@ -699,10 +699,10 @@ script_add_words(script_state_t *state, const script_word_info_t *vocab)
 {
 	while (vocab->code != NULL) {
 		// Patch in the previous word's info.
-		*(script_cell_t *)state->here = (script_cell_t)state->latest;
+		*(script_cell_t *)state->here = (script_cell_t)state->link;
 
-		// Make ourselves the latest.
-		state->latest = (uint8_t *)state->here;
+		// Make ourselves the link.
+		state->link = (uint8_t *)state->here;
 		state->here += sizeof(script_cell_t);
 
 		// Append the flags.
@@ -739,11 +739,12 @@ int
 script_state_init(script_state_t *state, uint8_t *heap)
 {
 	LOG_INFO("word info size %d", sizeof(script_word_info_t));
+	LOG_INFO("using script heap 0x%p", heap);
 	script_word_restart(state);
 
 	state->heap = heap;
 	state->here = heap;
-	state->latest = NULL;
+	state->link = NULL;
 	state->ip = NULL;
 
 	script_add_words(state, script_words_def);
