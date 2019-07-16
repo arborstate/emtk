@@ -1,15 +1,15 @@
 // Let's start at the beginning...
 
-// Word Defining / Dictionary Access
-// ---------------------------------
+// Bootstrap Word Creation
+// -----------------------
 dp @ link @ , 0 c, parse-name (header) ", align
-docol, ] dp @ link @ , 0 c, parse-name ", align link ! exit [ link !
+docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
 
-(header) : docol, ] (header) docol, ] exit [
-: nt>xt cell + 1 + dup c@ + 1 + aligned exit [
-: ' parse-name find-nt nt>xt exit [
+(header) : docol, ] (header) docol, ] exit [ latest @ link !
+: nt>xt cell + 1 + dup c@ + 1 + aligned exit [ latest @ link !
+: ' parse-name find-nt nt>xt exit [ latest @ link !
 
-: ; [ ' [ , ] lit exit , exit [ 1 link @ cell + c!
+: ; [ ' [ , ] lit exit , latest @ link ! exit [ latest @ link ! 1 link @ cell + c!
 
 : immediate 1 link @ cell + c! ;
 : is-immediate? cell + c@ 1 & ;
@@ -21,18 +21,14 @@ docol, ] dp @ link @ , 0 c, parse-name ", align link ! exit [ link !
 : xt>pf cell + ;
 : cells cell * ;
 
-(header) latestxt ' dovar xt>cfa , 0 ,
-: header (header) here latestxt ! ;
-: : header docol, ] ;
-
 : ['] lit [ ' lit , ] , ' , ; immediate
 : compile, ['] lit , ' , ['] , , ; immediate
 
 // Complex Word Defining
 // ---------------------
 
-: create header docol, compile, lit here 0 , compile, exit compile, exit here swap ! ;
-: (does) latestxt @ xt>pf 2 cells + ! ;
+: create (header) docol, compile, lit here 0 , compile, exit compile, exit here swap ! latest @ link ! ;
+: (does) latest @ nt>xt xt>pf 2 cells + ! ;
 : does> compile, lit here 0 , compile, (does) compile, exit here swap ! docol, ; immediate
 
 : constant create , does> @ ;
