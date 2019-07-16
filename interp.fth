@@ -86,7 +86,7 @@ defer ingest-number
 : convert-number
     base @ >r determine-base base !
     0 -rot >number
-    dup 0 > if ." failed to ingest number: " type abort else 2drop then
+    dup 0 > if ." failed to ingest: " type abort else 2drop then
     r> base ! ;
 : dispatch-number convert-number ingest-number ;
 
