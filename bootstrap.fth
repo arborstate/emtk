@@ -11,6 +11,9 @@ docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
 
 : ; [ ' [ , ] lit exit , latest @ link ! exit [ latest @ link ! 1 link @ cell + c!
 
+
+// Dictionary Helpers
+// ------------------
 : immediate 1 link @ cell + c! ;
 : is-immediate? cell + c@ 1 & ;
 
@@ -23,6 +26,7 @@ docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
 
 : ['] lit [ ' lit , ] , ' , ; immediate
 : compile, ['] lit , ' , ['] , , ; immediate
+
 
 // Complex Word Defining
 // ---------------------
