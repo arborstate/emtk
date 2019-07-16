@@ -102,6 +102,6 @@ defer ingest-number
 
 : outer begin available while parse-name process-name repeat prompt ;
 
-: quit begin tib 80 accept #tib ! 0 in> ! outer again ;
+: quit begin tib 256 accept #tib ! 0 in> ! outer again ;
 
 quit
