@@ -63,7 +63,9 @@
 : number> (number>) 2dup creverse ;
 
 create pad 80 allot
-: . pad number> type ;
+: emit pad c! pad 1 type ;
+: space 32 emit ;
+: . pad number> type space ;
 
 // Error Handlings
 // ---------------
