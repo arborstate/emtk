@@ -37,15 +37,22 @@ lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 // Complex Word Defining
 // ---------------------
 
-: create (header) docol, compile, lit here 0 , compile, exit compile, exit here swap ! latest @ link ! ;
+: ref< here ;
+: <ref here - , ;
+
+: ref> here 0 , ;
+: >ref here over - swap ! ;
+
+: create (header) docol, compile, rel ref> compile, exit compile, exit >ref latest @ link ! ;
+: xt>here xt>pf cell + dup @ + ;
 : (does) latest @ nt>xt xt>pf 2 cells + ! ;
-: does> compile, lit here 0 , compile, (does) compile, exit here swap ! docol, ; immediate
+: does> compile, rel ref> compile, (does) compile, exit >ref docol, ; immediate
 
 : constant create , does> @ ;
 : variable create 0 , ;
 
 : defer create compile, exit does> @ execute ;
-: deferaddr xt>pf cell + @ ;
+: deferaddr xt>here ;
 : is ' deferaddr ! ;
 : defer! deferaddr ! ;
 : defer@ deferaddr @ ;
@@ -54,12 +61,6 @@ lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 
 // Conditionals And Looping Constructs
 // -----------------------------------
-
-: ref< here ;
-: <ref here - , ;
-
-: ref> here 0 , ;
-: >ref here over - swap ! ;
 
 : if compile, 0branch ref> ; immediate
 : else compile, branch ref> swap >ref ; immediate

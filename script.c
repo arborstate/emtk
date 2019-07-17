@@ -218,6 +218,13 @@ SCRIPT_CODE_WORD(lit)
 	state->ip += 1;
 }
 
+SCRIPT_CODE_WORD(rel)
+{
+	_STACK(0) = (script_cell_t)((uint8_t *)state->ip + *state->ip);
+	_STACKINC(1);
+	state->ip += 1;
+}
+
 SCRIPT_CODE_WORD(base)
 {
 	_STACK(0) = (script_cell_t)&(state->base);
@@ -643,6 +650,7 @@ const script_word_info_t script_words_def[] = {
 	{ "cell", script_word_docon, sizeof(script_cell_t) },
 	SCRIPT_DICT_WORD(dp),
 	SCRIPT_DICT_WORD(lit),
+	SCRIPT_DICT_WORD(rel),
 	SCRIPT_DICT_WORD_ALIAS(zero_branch, 0branch),
 	SCRIPT_DICT_WORD(branch),
 	SCRIPT_DICT_WORD_ALIAS(fetch, @),
