@@ -56,10 +56,10 @@ lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 // -----------------------------------
 
 : ref< here ;
-: <ref , ;
+: <ref here - , ;
 
 : ref> here 0 , ;
-: >ref here swap ! ;
+: >ref here over - swap ! ;
 
 : if compile, 0branch ref> ; immediate
 : else compile, branch ref> swap >ref ; immediate

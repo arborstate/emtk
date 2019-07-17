@@ -435,7 +435,7 @@ SCRIPT_CODE_WORD(zero_branch)
 	_STACKINC(-1);
 
 	if (_STACK(0) == 0) {
-		state->ip = (script_cell_t *)dest;
+		state->ip = (script_cell_t *)((uint8_t *)state->ip + dest);
 	} else {
 		state->ip += 1;
 	}
@@ -443,7 +443,8 @@ SCRIPT_CODE_WORD(zero_branch)
 
 SCRIPT_CODE_WORD(branch)
 {
-	state->ip = (script_cell_t *)*state->ip;
+	script_cell_t dest = *state->ip;
+	state->ip = (script_cell_t *)((uint8_t *)state->ip + dest);
 }
 
 SCRIPT_CODE_WORD(link)
