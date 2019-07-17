@@ -54,15 +54,22 @@ lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 
 // Conditionals And Looping Constructs
 // -----------------------------------
-: if compile, 0branch here 0 , ; immediate
-: else compile, branch here 0 , swap here swap ! ; immediate
-: then here swap ! ; immediate
 
-: begin here ; immediate
-: again compile, branch , ; immediate
-: until compile, 0branch , ; immediate
-: while compile, 0branch here 0 , ; immediate
-: repeat swap compile, branch , here swap ! ; immediate
+: ref< here ;
+: <ref , ;
+
+: ref> here 0 , ;
+: >ref here swap ! ;
+
+: if compile, 0branch ref> ; immediate
+: else compile, branch ref> swap >ref ; immediate
+: then >ref ; immediate
+
+: begin ref< ; immediate
+: again compile, branch <ref ; immediate
+: until compile, 0branch <ref ; immediate
+: while compile, 0branch ref> ; immediate
+: repeat swap compile, branch <ref >ref ; immediate
 
 
 // Extended Stack Manipulation
