@@ -225,6 +225,11 @@ SCRIPT_CODE_WORD(rel)
 	state->ip += 1;
 }
 
+SCRIPT_CODE_WORD(cell)
+{
+	script_push(state, sizeof(script_cell_t));
+}
+
 SCRIPT_CODE_WORD(base)
 {
 	_STACK(0) = (script_cell_t)&(state->base);
