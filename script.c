@@ -764,7 +764,6 @@ script_state_init(script_state_t *state, uint8_t *heap)
 	state->latest = NULL;
 	state->ip = NULL;
 
-	script_add_words(state, script_words_def);
 	return 0;
 }
 
