@@ -755,7 +755,7 @@ int
 script_state_init(script_state_t *state, uint8_t *heap)
 {
 	LOG_INFO("word info size %d", sizeof(script_word_info_t));
-	LOG_INFO("using script heap 0x%p", heap);
+	LOG_INFO("using script heap %p", heap);
 	script_word_restart(state);
 
 	state->heap = heap;
