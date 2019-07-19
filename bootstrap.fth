@@ -1,15 +1,3 @@
-// Let's start at the beginning...
-
-// Bootstrap Word Creation
-// -----------------------
-dp @ link @ , 0 c, parse-name (header) ", align
-docol, ] dp @ latest ! link @ , 0 c, parse-name ", align exit [ link !
-
-(header) : docol, ] (header) docol, ] exit [ latest @ link !
-
-: ; [ parse-name [ find-nt cell + 1 + dup c@ + 1 + aligned , ]
-lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
-
 // Dictionary Helpers
 // ------------------
 : immediate 1 latest @ cell + c! ;
@@ -28,12 +16,6 @@ lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 : compile, ['] lit , ' , ['] , , ; immediate
 : postpone ' , ; immediate
 
-// High-Level Word Creation
-// ------------------------
-: header here latest ! link @ , 0 c, parse-name ", align ;
-: : header docol, ] ;
-: ; postpone [ compile, exit latest @ link ! ; immediate
-
 // Complex Word Defining
 // ---------------------
 
@@ -43,7 +25,7 @@ lit exit , latest @ link ! exit [ latest @ link ! 1 latest @ cell + c!
 : ref> here 0 , ;
 : >ref here over - swap ! ;
 
-: create (header) docol, compile, rel ref> compile, exit compile, exit >ref latest @ link ! ;
+: create header docol, compile, rel ref> compile, exit compile, exit >ref latest @ link ! ;
 : xt>here xt>pf cell + dup @ + ;
 : (does) latest @ nt>xt xt>pf 2 cells + ! ;
 : does> compile, rel ref> compile, (does) compile, exit >ref docol, ; immediate
