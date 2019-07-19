@@ -1,6 +1,5 @@
 // Dictionary Helpers
 // ------------------
-: immediate 1 latest @ cell + c! ;
 : is-immediate? cell + c@ 1 & ;
 
 : here dp @ ;
@@ -12,9 +11,9 @@
 : cells cell * ;
 
 : ' parse-name find-nt nt>xt ;
-: ['] lit [ ' lit , ] , ' , ; immediate
-: compile, ['] lit , ' , ['] , , ; immediate
-: postpone ' , ; immediate
+: ['] immediate lit [ ' lit , ] , ' , ;
+: compile, immediate ['] lit , ' , ['] , , ;
+: postpone immediate ' , ;
 
 // Complex Word Defining
 // ---------------------
@@ -28,7 +27,7 @@
 : create header docol, compile, rel ref> compile, exit compile, exit >ref latest @ link ! ;
 : xt>here xt>pf cell + dup @ + ;
 : (does) latest @ nt>xt xt>pf 2 cells + ! ;
-: does> compile, rel ref> compile, (does) compile, exit >ref docol, ; immediate
+: does> immediate compile, rel ref> compile, (does) compile, exit >ref docol, ;
 
 : constant create , does> @ ;
 : variable create 0 , ;
@@ -44,15 +43,15 @@
 // Conditionals And Looping Constructs
 // -----------------------------------
 
-: if compile, 0branch ref> ; immediate
-: else compile, branch ref> swap >ref ; immediate
-: then >ref ; immediate
+: if immediate compile, 0branch ref> ;
+: else immediate compile, branch ref> swap >ref ;
+: then immediate >ref ;
 
-: begin ref< ; immediate
-: again compile, branch <ref ; immediate
-: until compile, 0branch <ref ; immediate
-: while compile, 0branch ref> ; immediate
-: repeat swap compile, branch <ref >ref ; immediate
+: begin immediate ref< ;
+: again immediate compile, branch <ref ;
+: until immediate compile, 0branch <ref ;
+: while immediate compile, 0branch ref> ;
+: repeat immediate swap compile, branch <ref >ref ;
 
 
 // Extended Stack Manipulation

@@ -8,7 +8,7 @@
 : skip-delim ['] is-delim? seek-tib ;
 
 : char skip-delim key ;
-: [char] char compile, lit , ; immediate
+: [char] immediate char compile, lit , ;
 
 : not-nl? 10 = 0= ;
 : // ['] not-nl? seek-tib ;
@@ -26,8 +26,8 @@
 : ", dup c, here over allot swap cmove ;
 : count dup c@ swap 1 + swap ;
 : (c") r> dup dup c@ + 1 + >r count ;
-: ["] compile, (c") " ", ; immediate
-: ." [ ' ["] , ] compile, type ; immediate
+: ["] immediate compile, (c") " ", ;
+: ." immediate [ ' ["] , ] compile, type ;
 : "+ >r dup if r@ - swap r@ + swap then r> drop ;
 
 : is-prefix?
@@ -74,7 +74,7 @@ create pad 80 allot
 defer abort
 ' restart ' abort defer!
 
-: abort" [ ' ." , ] compile, abort ; immediate
+: abort" immediate [ ' ." , ] compile, abort ;
 
 // Outer Interpreter/Compiler
 // --------------------------

@@ -132,6 +132,17 @@ dict_start:
 	xt store
 	xt exit
 
+	defdict "immediate", immediate, 1
+	cfa docol
+	xt lit
+	.int 1
+	xt latest
+	xt fetch
+	xt cell
+	xt add
+	xt cstore
+	xt exit
+
 	.macro dict_end
 	.balign 4
 	.global script_dict_end
