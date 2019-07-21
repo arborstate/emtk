@@ -66,8 +66,15 @@
 
 create pad 80 allot
 : emit pad c! pad 1 type ;
+: cr 10 emit ;
 : space 32 emit ;
 : . pad number> type space ;
+
+
+// Dictionary Convenience
+: show-word dup . cell + dup c@ . 1 + count type cr ;
+: words base @ hex link @ begin dup while dup show-word @ repeat drop base ! ;
+
 
 // Error Handlings
 // ---------------

@@ -77,6 +77,12 @@
 : / /mod swap drop ;
 : min 2dup > if swap then drop ;
 
+// Memory Access Helpers
+// ---------------------
+
+: +! swap over @ + swap ! ;
+
+
 // Character Memory Access
 // -----------------------
 : c!+ over c! 1 + ;
