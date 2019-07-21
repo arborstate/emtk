@@ -62,7 +62,8 @@
 
 : n>c [char] 0 + dup [char] 9 > if lit [ char A char : - , ] + then ;
 : (number>) dup rot begin dup while base @ /mod >r n>c c!+ r> repeat drop over - ;
-: number> (number>) 2dup creverse ;
+: handle-zero dup 0= if 1 + over [char] 0 swap c! then ;
+: number> (number>) handle-zero 2dup creverse ;
 
 create pad 80 allot
 : emit pad c! pad 1 type ;
