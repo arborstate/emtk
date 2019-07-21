@@ -802,8 +802,16 @@ script_word_ingest(script_state_t *state, const char *s)
 		errno = 0;
 
 		char *endptr;
+		script_cell_t base = state->base;
 
-		script_cell_t v = strtoul(s, &endptr, state->base);
+		if (strlen(s) > 2) {
+			if (strncmp(s, "0x", 2) == 0) {
+				s += 2;
+				base = 16;
+			}
+		}
+
+		script_cell_t v = strtoul(s, &endptr, base);
 
 		if (*endptr == '\0' && errno == 0) {
 			if (state->compiling) {
