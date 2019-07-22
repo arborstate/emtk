@@ -30,19 +30,18 @@
 : ." immediate [ ' ["] , ] postpone type ;
 : "+ >r dup if r@ - swap r@ + swap then r> drop ;
 
-: is-prefix?
-    swap -rot
-    2dup < if 2drop 2drop false exit then
-    min
-    begin dup
-    while
-	    >r 2dup c@ swap c@ -
+: compare
+    rot over - if drop 2drop false exit then
+    begin dup while
+	    >r
+	    over over c@ swap c@ -
 	    if r> drop 2drop false exit then
 	    1 + swap 1 + swap
 	    r> 1 -
     repeat
     drop 2drop true ;
 
+: is-prefix? rot over min -rot compare ;
 
 // Number Conversion Routines
 // --------------------------
