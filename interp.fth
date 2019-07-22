@@ -78,18 +78,13 @@
 
 // Error Handlings
 // ---------------
-defer abort
-' restart ' abort defer!
-
 : abort" immediate [ ' ." , ] compile, abort ;
 
 // Outer Interpreter/Compiler
 // --------------------------
 
-defer ingest-number
-
 : compile-number compiling @ if compile, lit , then ;
-' compile-number is ingest-number
+: ingest-number compile-number ;
 
 : determine-base 2dup ["] 0x" is-prefix? if 2 "+ 16 else base @ then ;
 : convert-number
