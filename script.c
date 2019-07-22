@@ -856,7 +856,11 @@ script_word_ingest(script_state_t *state, const char *s)
 		}
 	}
 
+#ifdef DEBUG
 	LOG_ERROR("failed to ingest word '%s': %s", s, strerror(errno));
+#else
+	LOG_ERROR("failed to ingest word '%s'", s);
+#endif
 
 	return -1;
 }
