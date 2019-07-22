@@ -9,8 +9,7 @@
 
 : ' parse-name find-nt nt>xt ;
 : ['] immediate lit [ ' lit , ] , ' , ;
-: compile, immediate ['] lit , ' , ['] , , ;
-: postpone immediate ' , ;
+: postpone immediate ['] lit , ' , ['] , , ;
 
 : here dp @ ;
 : allot dp @ + dp ! ;
@@ -27,15 +26,15 @@
 : ref> here 0 , ;
 : >ref here over - swap ! ;
 
-: if immediate compile, 0branch ref> ;
-: else immediate compile, branch ref> swap >ref ;
+: if immediate postpone 0branch ref> ;
+: else immediate postpone branch ref> swap >ref ;
 : then immediate >ref ;
 
 : begin immediate ref< ;
-: again immediate compile, branch <ref ;
-: until immediate compile, 0branch <ref ;
-: while immediate compile, 0branch ref> ;
-: repeat immediate swap compile, branch <ref >ref ;
+: again immediate postpone branch <ref ;
+: until immediate postpone 0branch <ref ;
+: while immediate postpone 0branch ref> ;
+: repeat immediate swap postpone branch <ref >ref ;
 
 
 // Extended Stack Manipulation
@@ -95,15 +94,15 @@
 // Complex Word Defining
 // ---------------------
 
-: create header docol, compile, rel ref> compile, exit compile, exit >ref latest @ link ! ;
+: create header docol, postpone rel ref> postpone exit postpone exit >ref latest @ link ! ;
 : xt>here xt>pf cell + dup @ + ;
 : (does) latest @ nt>xt xt>pf 2 cells + ! ;
-: does> immediate compile, rel ref> compile, (does) compile, exit >ref docol, ;
+: does> immediate postpone rel ref> postpone (does) postpone exit >ref docol, ;
 
 : constant create , does> @ ;
 : variable create 0 , ;
 
-: defer create compile, exit does> @ execute ;
+: defer create postpone exit does> @ execute ;
 : deferaddr xt>here ;
 : is ' deferaddr ! ;
 : defer! deferaddr ! ;

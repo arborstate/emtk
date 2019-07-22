@@ -8,7 +8,7 @@
 : skip-delim ['] is-delim? seek-tib ;
 
 : char skip-delim key ;
-: [char] immediate char compile, lit , ;
+: [char] immediate char postpone lit , ;
 
 : not-nl? 10 = 0= ;
 : // ['] not-nl? seek-tib ;
@@ -26,8 +26,8 @@
 : ", dup c, here over allot swap cmove ;
 : count dup c@ swap 1 + swap ;
 : (c") r> dup dup c@ + 1 + >r count ;
-: ["] immediate compile, (c") " ", ;
-: ." immediate [ ' ["] , ] compile, type ;
+: ["] immediate postpone (c") " ", ;
+: ." immediate [ ' ["] , ] postpone type ;
 : "+ >r dup if r@ - swap r@ + swap then r> drop ;
 
 : is-prefix?
@@ -78,12 +78,12 @@
 
 // Error Handlings
 // ---------------
-: abort" immediate [ ' ." , ] compile, abort ;
+: abort" immediate [ ' ." , ] postpone abort ;
 
 // Outer Interpreter/Compiler
 // --------------------------
 
-: compile-number compiling @ if compile, lit , then ;
+: compile-number compiling @ if postpone lit , then ;
 : ingest-number compile-number ;
 
 : determine-base 2dup ["] 0x" is-prefix? if 2 "+ 16 else base @ then ;
