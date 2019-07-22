@@ -65,7 +65,6 @@
 : handle-zero dup 0= if 1 + over [char] 0 swap c! then ;
 : number> (number>) handle-zero 2dup creverse ;
 
-create pad 80 allot
 : emit pad c! pad 1 type ;
 : cr 10 emit ;
 : space 32 emit ;

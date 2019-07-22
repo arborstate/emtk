@@ -87,6 +87,7 @@ dict_start:
 	defcode "tib", tib
 	defcode "#tib", tiblen
 	defcode "in>", tibpos
+	defcode "pad", pad
 	defcode ".", pop_and_display
 	defcode ".s", stack_dump
 	defcode "accept", accept

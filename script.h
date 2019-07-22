@@ -51,6 +51,7 @@ struct _script_state {
 
 	script_cell_t base;
 
+	uint8_t *pad;
 	uint8_t *heap;
 	uint8_t *here;
 	uint8_t *link;

@@ -260,6 +260,11 @@ SCRIPT_CODE_WORD(tibpos)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(pad)
+{
+	script_push(state, (script_cell_t)state->pad);
+}
+
 SCRIPT_CODE_WORD(compiling)
 {
 	_STACK(0) = (script_cell_t)&(state->compiling);
@@ -762,6 +767,9 @@ script_state_init(script_state_t *state, uint8_t *heap)
 	LOG_INFO("word info size %d", sizeof(script_word_info_t));
 	LOG_INFO("using script heap %p", heap);
 	script_word_restart(state);
+
+	state->pad = heap;
+	heap += 128;
 
 	state->heap = heap;
 	state->here = heap;
