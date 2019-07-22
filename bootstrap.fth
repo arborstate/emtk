@@ -2,9 +2,6 @@
 // ------------------
 : is-immediate? cell + c@ 1 & ;
 
-: here dp @ ;
-: allot dp @ + dp ! ;
-
 : nt>xt cell + 1 + dup c@ + 1 + aligned ;
 : xt>cfa @ ;
 : xt>pf cell + ;
@@ -15,33 +12,20 @@
 : compile, immediate ['] lit , ' , ['] , , ;
 : postpone immediate ' , ;
 
-// Complex Word Defining
-// ---------------------
+: here dp @ ;
+: allot dp @ + dp ! ;
+
+: abort restart ;
+
+
+// Conditionals And Looping Constructs
+// -----------------------------------
 
 : ref< here ;
 : <ref here - , ;
 
 : ref> here 0 , ;
 : >ref here over - swap ! ;
-
-: create header docol, compile, rel ref> compile, exit compile, exit >ref latest @ link ! ;
-: xt>here xt>pf cell + dup @ + ;
-: (does) latest @ nt>xt xt>pf 2 cells + ! ;
-: does> immediate compile, rel ref> compile, (does) compile, exit >ref docol, ;
-
-: constant create , does> @ ;
-: variable create 0 , ;
-
-: defer create compile, exit does> @ execute ;
-: deferaddr xt>here ;
-: is ' deferaddr ! ;
-: defer! deferaddr ! ;
-: defer@ deferaddr @ ;
-
-: marker create link @ , here cell + , does> dup @ link ! cell + @ dp ! ;
-
-// Conditionals And Looping Constructs
-// -----------------------------------
 
 : if immediate compile, 0branch ref> ;
 : else immediate compile, branch ref> swap >ref ;
@@ -106,3 +90,23 @@
     repeat
     drop drop drop
 ;
+
+
+// Complex Word Defining
+// ---------------------
+
+: create header docol, compile, rel ref> compile, exit compile, exit >ref latest @ link ! ;
+: xt>here xt>pf cell + dup @ + ;
+: (does) latest @ nt>xt xt>pf 2 cells + ! ;
+: does> immediate compile, rel ref> compile, (does) compile, exit >ref docol, ;
+
+: constant create , does> @ ;
+: variable create 0 , ;
+
+: defer create compile, exit does> @ execute ;
+: deferaddr xt>here ;
+: is ' deferaddr ! ;
+: defer! deferaddr ! ;
+: defer@ deferaddr @ ;
+
+: marker create link @ , here cell + , does> dup @ link ! cell + @ dp ! ;
