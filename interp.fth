@@ -95,6 +95,15 @@
 
 : dispatch-word dup is-immediate? compiling @ 0= | swap nt>xt swap if execute else , then ;
 
+: find-nt
+    link @ >r
+    begin r@ while
+	    2dup r@ cell + 1 + count compare
+	    if 2drop r> exit then
+	    r> @ >r
+    repeat
+    2drop r> ;
+
 : process-name
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
