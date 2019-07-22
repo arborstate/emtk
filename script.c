@@ -112,6 +112,27 @@ SCRIPT_CODE_WORD(divmod)
 	_STACK(2) = dividend % divisor;
 }
 
+SCRIPT_CODE_WORD(type)
+{
+	if (state->type) {
+		state->type(state);
+	} else {
+		size_t count = _STACK(1);
+		const char *s = (const char *)_STACK(2);
+		_STACKINC(-2);
+
+		char buf[count + 1];
+
+		size_t i;
+		for (i = 0; i < count; i++) {
+			buf[i] = *s;
+			s++;
+		}
+
+		buf[i] = '\0';
+		LOG_INFO("%s", buf);
+	}
+}
 
 static int _cell2str(script_cell_t v, script_cell_t base, char *output, size_t outputlen)
 {
@@ -163,24 +184,30 @@ static int _cell2str(script_cell_t v, script_cell_t base, char *output, size_t o
 SCRIPT_CODE_WORD(pop_and_display)
 {
 	script_cell_t v = script_pop(state);
-	char buf[(sizeof(script_cell_t) * 8) + 1];
+	char buf[(sizeof(script_cell_t) * 8)];
 
-	size_t count = _cell2str(v, state->base, buf, sizeof(buf) - 1);
-	buf[count] = '\0';
+	size_t count = _cell2str(v, state->base, buf, sizeof(buf));
 
-	LOG_INFO("%s", buf);
+	script_push(state, (script_cell_t)buf);
+	script_push(state, count);
+	script_word_type(state);
 }
 
 
 SCRIPT_CODE_WORD(stack_dump)
 {
-	char buf[(sizeof(script_cell_t) * 8) + 1];
+	char buf[sizeof(script_cell_t) * 8];
 	size_t count;
 
 	for (size_t i = 0; i < state->stackpos; i++) {
-		count = _cell2str(state->stack[i], state->base, buf, sizeof(buf) - 1);
-		buf[count] = '\0';
-		LOG_INFO("%d: %s", i, buf);
+		count = _cell2str(state->stack[i], state->base, buf, sizeof(buf));
+		script_push(state, (script_cell_t)buf);
+		script_push(state, count);
+		script_word_type(state);
+		script_push(state, (script_cell_t)" ");
+		script_push(state, 1);
+		script_word_type(state);
+
 	}
 }
 
@@ -413,28 +440,6 @@ SCRIPT_CODE_WORD(parse_name)
 	// Push the string onto the stack.
 	script_push(state, (script_cell_t)start);
 	script_push(state, (script_cell_t)((state->tib + state->tibpos) - start));
-}
-
-SCRIPT_CODE_WORD(type)
-{
-	if (state->type) {
-		state->type(state);
-	} else {
-		size_t count = _STACK(1);
-		const char *s = (const char *)_STACK(2);
-		_STACKINC(-2);
-
-		char buf[count + 1];
-
-		size_t i;
-		for (i = 0; i < count; i++) {
-			buf[i] = *s;
-			s++;
-		}
-
-		buf[i] = '\0';
-		LOG_INFO("%s", buf);
-	}
 }
 
 SCRIPT_CODE_WORD(next)
