@@ -59,6 +59,13 @@
 	    >r rot base @ * r> + -rot 1 - swap 1 + swap
     repeat ;
 
+: determine-base 2dup ["] 0x" is-prefix? if 2 "+ 16 else base @ then ;
+: convert-number
+    base @ >r determine-base base !
+    0 -rot >number
+    dup 0 > if ." failed to ingest: " type abort else 2drop then
+    r> base ! ;
+
 : n>c [char] 0 + dup [char] 9 > if lit [ char A char : - , ] + then ;
 : (number>) dup rot begin dup while base @ /mod >r n>c c!+ r> repeat drop over - ;
 : handle-zero dup 0= if 1 + over [char] 0 swap c! then ;
@@ -71,29 +78,9 @@
 
 
 // Dictionary Convenience
+// -----------------------
 : show-word dup . cell + dup c@ . 1 + count type cr ;
 : words base @ hex link @ begin dup while dup show-word @ repeat drop base ! ;
-
-
-// Error Handlings
-// ---------------
-: abort" immediate [ ' ." , ] postpone abort ;
-
-// Outer Interpreter/Compiler
-// --------------------------
-
-: compile-number compiling @ if postpone lit , then ;
-: ingest-number compile-number ;
-
-: determine-base 2dup ["] 0x" is-prefix? if 2 "+ 16 else base @ then ;
-: convert-number
-    base @ >r determine-base base !
-    0 -rot >number
-    dup 0 > if ." failed to ingest: " type abort else 2drop then
-    r> base ! ;
-: dispatch-number convert-number ingest-number ;
-
-: dispatch-word dup is-immediate? compiling @ 0= | swap nt>xt swap if execute else , then ;
 
 : find-nt
     link @ >r
@@ -104,11 +91,25 @@
     repeat
     2drop r> ;
 
+
+// Error Handlings
+// ---------------
+: abort" immediate [ ' ." , ] postpone abort ;
+
+
+// Outer Interpreter/Compiler
+// --------------------------
+: prompt (c") [ 4 c, 32 c, char o c, char k c, 10 c, ] type ;
+
+: compile-number compiling @ if postpone lit , then ;
+: ingest-number compile-number ;
+: dispatch-number convert-number ingest-number ;
+
+: dispatch-word dup is-immediate? compiling @ 0= | swap nt>xt swap if execute else , then ;
+
 : process-name
     dup 0= if drop drop exit then
     2dup find-nt ?dup if -rot 2drop dispatch-word exit else dispatch-number then ;
-
-: prompt (c") [ 4 c, 32 c, char o c, char k c, 10 c, ] type ;
 
 : outer begin available while parse-name process-name repeat prompt ;
 
