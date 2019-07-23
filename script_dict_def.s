@@ -71,7 +71,7 @@ dict_start:
 	defcode "exit", exit
 	defcode "docon", docon
 	defcode "dovar", dovar
-	defcode "link", link
+	defcode "get-current", get_current
 	defcode "latest", latest
 	defcode "cell", cell
 	defcode "align", align
@@ -100,7 +100,7 @@ dict_start:
 	xt fetch
 	xt latest
 	xt store
-	xt link
+	xt get_current
 	xt fetch
 	xt comma
 	xt lit
@@ -128,7 +128,7 @@ dict_start:
 	xt comma
 	xt latest
 	xt fetch
-	xt link
+	xt get_current
 	xt store
 	xt exit
 

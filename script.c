@@ -461,7 +461,7 @@ SCRIPT_CODE_WORD(branch)
 	state->ip = (script_cell_t *)((uint8_t *)state->ip + dest);
 }
 
-SCRIPT_CODE_WORD(link)
+SCRIPT_CODE_WORD(get_current)
 {
 	_STACK(0) = (script_cell_t)&state->link;
 	_STACKINC(1);
@@ -705,7 +705,7 @@ const script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(exit),
 	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
 	SCRIPT_DICT_WORD(type),
-	SCRIPT_DICT_WORD(link),
+	SCRIPT_DICT_WORD_ALIAS(get_current, get-current),
 	SCRIPT_DICT_WORD(latest),
 	{ "[", script_word_interp_mode, 0, SCRIPT_FLAG_IMMEDIATE, 0},
 	{ "]", script_word_compile_mode, 0, 0, 0},

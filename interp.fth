@@ -80,10 +80,10 @@
 // Dictionary Convenience
 // -----------------------
 : show-word dup . cell + dup c@ . 1 + count type cr ;
-: words base @ hex link @ begin dup while dup show-word @ repeat drop base ! ;
+: words base @ hex get-current @ begin dup while dup show-word @ repeat drop base ! ;
 
 : find-nt
-    link @ >r
+    get-current @ >r
     begin r@ while
 	    2dup r@ cell + 1 + count compare
 	    if 2drop r> exit then

@@ -95,7 +95,7 @@
 // ---------------------
 
 : docol, ['] docol xt>cfa , ;
-: create header docol, postpone rel ref> postpone exit postpone exit >ref latest @ link ! ;
+: create header docol, postpone rel ref> postpone exit postpone exit >ref latest @ get-current ! ;
 : xt>here xt>pf cell + dup @ + ;
 : (does) latest @ nt>xt xt>pf 2 cells + ! ;
 : does> immediate postpone rel ref> postpone (does) postpone exit >ref docol, ;
@@ -109,4 +109,4 @@
 : defer! deferaddr ! ;
 : defer@ deferaddr @ ;
 
-: marker create link @ , here cell + , does> dup @ link ! cell + @ dp ! ;
+: marker create get-current @ , here cell + , does> dup @ get-current ! cell + @ dp ! ;
