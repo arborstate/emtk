@@ -144,6 +144,12 @@ dict_start:
 	xt exit
 
 	.macro dict_end
+	.set _dict_end_link, link
+	defdict "_dict_end", _dict_end
+	cfa docon
+	.int _dict_end_link
+	xt exit
+
 	.balign 4
 	.global script_dict_end
 script_dict_end:
