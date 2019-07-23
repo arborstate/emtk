@@ -68,7 +68,6 @@ dict_start:
 	defcode "0branch",zero_branch
 	defcode "branch",branch
 	defcode "docol", docol
-	defcode "docol,", append_docol
 	defcode "exit", exit
 	defcode "docon", docon
 	defcode "dovar", dovar

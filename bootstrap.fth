@@ -94,6 +94,7 @@
 // Complex Word Defining
 // ---------------------
 
+: docol, ['] docol xt>cfa , ;
 : create header docol, postpone rel ref> postpone exit postpone exit >ref latest @ link ! ;
 : xt>here xt>pf cell + dup @ + ;
 : (does) latest @ nt>xt xt>pf 2 cells + ! ;

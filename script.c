@@ -224,14 +224,6 @@ SCRIPT_CODE_WORD(docol)
 	state->ip = (script_cell_t *)state->w + 1;
 }
 
-SCRIPT_CODE_WORD(append_docol)
-{
-	script_cell_t *here = (script_cell_t *)state->here;
-
-	*here = (script_cell_t)script_word_docol;
-	state->here += sizeof(script_cell_t);
-}
-
 SCRIPT_CODE_WORD(exit)
 {
 	state->rstackpos -= 1;
@@ -710,7 +702,6 @@ const script_word_info_t script_words_def[] = {
 	SCRIPT_DICT_WORD(docon),
 	SCRIPT_DICT_WORD(docol),
 	SCRIPT_DICT_WORD(dovar),
-	{ "docol,", script_word_append_docol },
 	SCRIPT_DICT_WORD(exit),
 	SCRIPT_DICT_WORD_ALIAS(parse_name, parse-name),
 	SCRIPT_DICT_WORD(type),
