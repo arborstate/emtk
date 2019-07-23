@@ -341,7 +341,7 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 {
 	script_word_info_t info = {0};
 
-	uint8_t *link = state->link;
+	uint8_t *link = (uint8_t *)state->link;
 	while (link != NULL) {
 		uint8_t *name = link + sizeof(script_cell_t) + 2;
 		uint8_t count = *(name - 1);
@@ -654,12 +654,13 @@ script_pop(script_state_t *state) {
 void
 script_add_words(script_state_t *state, const script_word_info_t *vocab)
 {
+
 	while (vocab->code != NULL) {
 		// Patch in the previous word's info.
 		*(script_cell_t *)state->here = (script_cell_t)state->link;
 
 		// Make ourselves the link.
-		state->link = (uint8_t *)state->here;
+		state->link = (script_wordlist_t)state->here;
 		state->here += sizeof(script_cell_t);
 
 		// Append the flags.

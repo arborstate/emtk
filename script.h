@@ -18,6 +18,8 @@ typedef int script_cell_t;
 typedef SCRIPT_CELL_TYPE script_cell_t;
 #endif
 
+typedef script_cell_t * script_wordlist_t;
+
 struct _script_state;
 struct _script_word_info;
 
@@ -54,8 +56,9 @@ struct _script_state {
 	uint8_t *pad;
 	uint8_t *heap;
 	uint8_t *here;
-	uint8_t *link;
 	uint8_t *latest;
+
+	script_wordlist_t link;
 
 	uint8_t compiling;
 
