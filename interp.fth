@@ -26,8 +26,8 @@
 : ", dup c, here over allot swap cmove ;
 : count dup c@ swap 1 + swap ;
 : (c") r> dup dup c@ + 1 + >r count ;
-: ["] immediate postpone (c") " ", ;
-: ." immediate [ ' ["] , ] postpone type ;
+: s" immediate postpone (c") " ", ;
+: ." immediate [ ' s" , ] postpone type ;
 : "+ >r dup if r@ - swap r@ + swap then r> drop ;
 
 : compare
@@ -59,7 +59,7 @@
 	    >r rot base @ * r> + -rot 1 - swap 1 + swap
     repeat ;
 
-: determine-base 2dup ["] 0x" is-prefix? if 2 "+ 16 else base @ then ;
+: determine-base 2dup s" 0x" is-prefix? if 2 "+ 16 else base @ then ;
 : convert-number
     base @ >r determine-base base !
     0 -rot >number
