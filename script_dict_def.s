@@ -72,6 +72,7 @@ dict_start:
 	defcode "docon", docon
 	defcode "dovar", dovar
 	defcode "get-current", get_current
+	defcode "set-current", set_current
 	defcode "latest", latest
 	defcode "cell", cell
 	defcode "align", align

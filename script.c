@@ -341,7 +341,7 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 {
 	script_word_info_t info = {0};
 
-	uint8_t *link = (uint8_t *)state->link;
+	uint8_t *link = (uint8_t *)*(state->current);
 	while (link != NULL) {
 		uint8_t *name = link + sizeof(script_cell_t) + 2;
 		uint8_t count = *(name - 1);
@@ -463,8 +463,13 @@ SCRIPT_CODE_WORD(branch)
 
 SCRIPT_CODE_WORD(get_current)
 {
-	_STACK(0) = (script_cell_t)&state->link;
+	_STACK(0) = (script_cell_t)state->current;
 	_STACKINC(1);
+}
+
+SCRIPT_CODE_WORD(set_current)
+{
+	state->current = (script_wordlist_t *)script_pop(state);
 }
 
 SCRIPT_CODE_WORD(latest)
@@ -495,7 +500,7 @@ SCRIPT_CODE_WORD(aligned)
 
 SCRIPT_CODE_WORD(words)
 {
-	script_cell_t *link = (script_cell_t *)state->link;
+	script_cell_t *link = (script_cell_t *)*(state->current);
 	char buf[64];
 	uint8_t *p;
 
@@ -657,10 +662,10 @@ script_add_words(script_state_t *state, const script_word_info_t *vocab)
 
 	while (vocab->code != NULL) {
 		// Patch in the previous word's info.
-		*(script_cell_t *)state->here = (script_cell_t)state->link;
+		*(script_cell_t *)state->here = (script_cell_t)*(state->current);
 
 		// Make ourselves the link.
-		state->link = (script_wordlist_t)state->here;
+		*(state->current) = (script_wordlist_t)state->here;
 		state->here += sizeof(script_cell_t);
 
 		// Append the flags.
@@ -705,7 +710,6 @@ script_state_init(script_state_t *state, uint8_t *heap)
 
 	state->heap = heap;
 	state->here = heap;
-	state->link = NULL;
 	state->latest = NULL;
 	state->ip = NULL;
 

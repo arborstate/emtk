@@ -58,7 +58,7 @@ struct _script_state {
 	uint8_t *here;
 	uint8_t *latest;
 
-	script_wordlist_t link;
+	script_wordlist_t *current;
 
 	uint8_t compiling;
 
