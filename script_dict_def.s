@@ -150,7 +150,6 @@ dict_start:
 	defdict "_dict_end", _dict_end
 	cfa docon
 	.int _dict_end_link
-	xt exit
 
 	.balign 4
 	.global script_dict_end
