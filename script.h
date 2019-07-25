@@ -89,4 +89,6 @@ void script_next(script_state_t *state);
 
 #define SCRIPT_CELL_ALIGN(v) (((size_t)(v) % sizeof(script_cell_t)) ? ((v) + (sizeof(script_cell_t) - ((size_t)(v) % sizeof(script_cell_t)))) : (v))
 
+SCRIPT_CODE_WORD(quit);
+
 #endif /* __SCRIPT_H__ */

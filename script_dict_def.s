@@ -94,6 +94,7 @@ dict_start:
 	defcode "parse-name", parse_name
 	defcode "type", type
 	defcode "restart", restart
+	defcode "quit", quit
 
 	defdict "header", header
 	cfa docol

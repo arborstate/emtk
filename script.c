@@ -840,3 +840,19 @@ script_eval_buf(script_state_t *state, const char *s, size_t len)
 
 	return 0;
 }
+
+SCRIPT_CODE_WORD(quit)
+{
+	char buf[256];
+	while (1) {
+		script_push(state, (script_cell_t)buf);
+		script_push(state, sizeof(buf));
+		state->accept(state);
+		size_t tiblen = script_pop(state);
+
+		script_eval_buf(state, buf, tiblen);
+		script_push(state, (script_cell_t)" ok\n");
+		script_push(state, 5);
+		state->type(state);
+	}
+}
