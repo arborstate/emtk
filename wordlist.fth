@@ -40,5 +40,3 @@ create context 16 cells allot
 : quit begin tib 256 accept #tib ! 0 in> ! outer again ;
 
 core 1 set-order
-
-" launching with wordlists" type quit
