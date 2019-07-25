@@ -60,11 +60,11 @@ struct _script_state {
 
 	script_wordlist_t *current;
 
-	uint8_t compiling;
+	script_cell_t compiling;
 
 	script_word_t accept;
 	script_word_t type;
-};
+} __attribute__((packed));
 
 typedef struct _script_state script_state_t;
 
