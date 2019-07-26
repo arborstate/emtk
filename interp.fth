@@ -80,7 +80,8 @@
 // Dictionary Convenience
 // -----------------------
 : show-word dup . cell + dup c@ . 1 + count type cr ;
-: words base @ hex get-current @ begin dup while dup show-word @ repeat drop base ! ;
+: (words) base @ >r hex begin dup while dup show-word @ repeat drop r> base ! ;
+: words get-current @ (words) ;
 
 : wordlist-find-nt
     @ >r
