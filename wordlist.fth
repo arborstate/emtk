@@ -26,6 +26,8 @@ create context 16 cells allot
     2drop 2drop 0
 ;
 
+: words get-order begin ?dup while >r @ (words) r> 1 - repeat ;
+
 : ' parse-name find-nt nt>xt ;
 
 : process-name
@@ -40,3 +42,4 @@ create context 16 cells allot
 : quit begin tib 256 accept #tib ! 0 in> ! outer again ;
 
 core 1 set-order
+quit
