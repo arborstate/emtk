@@ -4,9 +4,6 @@ get-current constant core
 // -----------------
 : wordlist here 0 , ;
 
-wordlist constant flash
-_dict_end flash !
-
 variable #order 0 #order !
 create context 16 cells allot
 
