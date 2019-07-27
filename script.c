@@ -10,20 +10,18 @@
 SCRIPT_CODE_WORD(restart)
 {
 	LOG_DEBUG("restarting script environment");
-	state->stackpos = 0;
-	state->rstackpos = 0;
 
-	state->tib = NULL;
-	state->tibpos = 0;
-	state->tiblen = 0;
-
+	state->sp = state->sp0;
+	state->rp = state->rp0;
 	state->base = 10;
-
 	state->compiling = 0;
 }
 
-#define _STACK(pos) state->stack[state->stackpos - pos]
-#define _STACKINC(v) state->stackpos += v
+#define _STACK(pos) *(state->sp - pos)
+#define _STACKINC(v) (state->sp += v)
+
+#define _RSTACK(pos) *(state->rsp - pos)
+#define _RSTACKINC(v) (state->rsp += v)
 
 SCRIPT_CODE_WORD(store)
 {
@@ -199,8 +197,14 @@ SCRIPT_CODE_WORD(stack_dump)
 	char buf[sizeof(script_cell_t) * 8];
 	size_t count;
 
-	for (size_t i = 0; i < state->stackpos; i++) {
-		count = _cell2str(state->stack[i], state->base, buf, sizeof(buf));
+	size_t depth = (state->sp - state->sp0);
+
+	script_cell_t *sp = state->sp0;
+
+	for (size_t i = 0; i < depth ; i++) {
+		count = _cell2str(*sp, state->base, buf, sizeof(buf));
+		sp++;
+
 		script_push(state, (script_cell_t)buf);
 		script_push(state, count);
 		script_word_type(state);
@@ -218,16 +222,16 @@ SCRIPT_CODE_WORD(dovar)
 
 SCRIPT_CODE_WORD(docol)
 {
-	state->rstack[state->rstackpos] = state->ip;
-	state->rstackpos += 1;
+	*state->rp = state->ip;
+	state->rp++;
 
 	state->ip = (script_cell_t *)state->w + 1;
 }
 
 SCRIPT_CODE_WORD(exit)
 {
-	state->rstackpos -= 1;
-	state->ip = state->rstack[state->rstackpos];
+	state->rp--;
+	state->ip = *state->rp;
 }
 
 SCRIPT_CODE_WORD(lit)
@@ -534,22 +538,22 @@ SCRIPT_CODE_WORD(words)
 
 SCRIPT_CODE_WORD(rpop)
 {
-	state->rstackpos -= 1;
-	_STACK(0) = (script_cell_t)state->rstack[state->rstackpos];
+	state->rp--;
+	_STACK(0) = (script_cell_t)*state->rp;
 	_STACKINC(1);
 }
 
 SCRIPT_CODE_WORD(rpush)
 {
 	_STACKINC(-1);
-	state->rstack[state->rstackpos] = (script_cell_t *)_STACK(0);
-	state->rstackpos += 1;
+	*state->rp = (script_cell_t *)_STACK(0);
+	state->rp++;
 }
 
 SCRIPT_CODE_WORD(rfetch)
 {
 
-	_STACK(0) = (script_cell_t)state->rstack[state->rstackpos - 1];
+	_STACK(0) = (script_cell_t)*(state->rp - 1);
 	_STACKINC(1);
 }
 
@@ -699,19 +703,12 @@ script_add_words(script_state_t *state, const script_word_info_t *vocab)
 }
 
 int
-script_state_init(script_state_t *state, uint8_t *heap)
+script_state_init(script_state_t *state)
 {
 	LOG_INFO("word info size %d", sizeof(script_word_info_t));
-	LOG_INFO("using script heap %p", heap);
+
+	memset(state, 0, sizeof(state));
 	script_word_restart(state);
-
-	state->pad = heap;
-	heap += 128;
-
-	state->heap = heap;
-	state->here = heap;
-	state->latest = NULL;
-	state->ip = NULL;
 
 	return 0;
 }
@@ -735,7 +732,7 @@ script_word_ingest(script_state_t *state, const char *s)
 
 			do {
 				script_word_next(state);
-			} while (state->rstackpos != 0);
+			} while (state->rp != state->rp0);
 		}
 
 		return 0;

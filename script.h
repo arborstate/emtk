@@ -37,11 +37,10 @@ struct _script_word_info {
 typedef struct _script_word_info script_word_info_t;
 
 struct _script_state {
-	script_cell_t stack[SCRIPT_STACK_DEPTH];
-	size_t stackpos;
-
-	script_cell_t *rstack[SCRIPT_STACK_DEPTH];
-	size_t rstackpos;
+	script_cell_t sp0[SCRIPT_STACK_DEPTH];
+	script_cell_t *sp;
+	script_cell_t *rp0[SCRIPT_STACK_DEPTH];
+	script_cell_t **rp;
 
 	script_cell_t *ip;
 	// Current XT
@@ -51,25 +50,25 @@ struct _script_state {
 	size_t tibpos;
 	size_t tiblen;
 
+	script_word_t accept;
+	script_word_t type;
+
 	script_cell_t base;
 
-	uint8_t *pad;
-	uint8_t *heap;
+	script_cell_t compiling;
+	uint8_t pad[128];
+
 	uint8_t *here;
 	uint8_t *latest;
 
 	script_wordlist_t *current;
-
-	script_cell_t compiling;
-
-	script_word_t accept;
-	script_word_t type;
+	script_wordlist_t context[16];
 } __attribute__((packed));
 
 typedef struct _script_state script_state_t;
 
 
-int script_state_init(script_state_t *state, uint8_t *heap);
+int script_state_init(script_state_t *state);
 void script_add_words(script_state_t *state, const script_word_info_t *vocab);
 
 void script_push(script_state_t *state, script_cell_t v);

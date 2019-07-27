@@ -7,7 +7,7 @@
 #include "script.h"
 #include "log.h"
 
-script_state_t _script_state;
+script_state_t *_script_state;
 
 void _accept_stdin(script_state_t *state)
 {
@@ -45,10 +45,15 @@ main(void)
 	uint8_t heap[16384];
 	char buf[1024];
 
-	script_state_init(&_script_state, heap);
+	uint8_t *here = heap;
 
-	_script_state.accept = _accept_stdin;
-	_script_state.type = _type_stdout;
+	_script_state = (script_state_t *)here;
+	script_state_init(_script_state);
+	here += sizeof(script_state_t);
+
+	_script_state->accept = _accept_stdin;
+	_script_state->type = _type_stdout;
+	_script_state->here = here;
 
 	size_t len;
 	while (1) {
@@ -67,7 +72,7 @@ main(void)
 		// LOG_DEBUG("got input '%s'", buf);
 		buf[len] = '\0';
 
-		script_eval_buf(&_script_state, buf, len);
+		script_eval_buf(_script_state, buf, len);
 		LOG_INFO("ok");
 	}
 

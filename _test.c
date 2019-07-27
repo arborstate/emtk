@@ -128,11 +128,16 @@ _test_slcan(void)
 int
 _test_script(void)
 {
-#define _W(x) if (script_word_ingest(&state, #x) != 0) return -1
-	script_state_t state;
+#define _W(x) if (script_word_ingest(state, #x) != 0) return -1
 	uint8_t heap[1024];
+	uint8_t *here = heap;
 
-	script_state_init(&state, heap);
+	script_state_t *state = (script_state_t *)here;
+	script_state_init(state);
+	here += sizeof(script_state_t);
+
+	state->here = here;
+
 	_W(16);
 	_W(base);
 	_W(!);
@@ -157,9 +162,7 @@ _test_script(void)
 
 	_W(drop);
 
-	script_eval_str(&state, "3 4 + .\r");
-
-	LOG_DEBUG("script stackpos is %d", state.stackpos);
+	script_eval_str(state, "3 4 + .\r");
 
 	return 0;
 }
