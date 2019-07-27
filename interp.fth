@@ -67,7 +67,7 @@
 : convert-number
     base @ >r determine-base base !
     0 -rot >number
-    dup 0 > if ." failed to ingest: " type abort else 2drop then
+    dup 0 > if ." failed to ingest: " type cr abort else 2drop then
     r> base ! ;
 
 : n>c [char] 0 + dup [char] 9 > if lit [ char A char : - , ] + then ;
