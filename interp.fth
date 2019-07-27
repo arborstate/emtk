@@ -4,6 +4,10 @@
 : seek-tib true begin available & while cur@ over execute dup if advance then repeat drop ;
 : key available if cur@ advance then ;
 
+: emit pad c! pad 1 type ;
+: cr 10 emit ;
+: space 32 emit ;
+
 : is-delim? 33 < ;
 : skip-delim ['] is-delim? seek-tib ;
 
@@ -71,9 +75,6 @@
 : handle-zero dup 0= if 1 + over [char] 0 swap c! then ;
 : number> (number>) handle-zero 2dup creverse ;
 
-: emit pad c! pad 1 type ;
-: cr 10 emit ;
-: space 32 emit ;
 : . pad number> type space ;
 
 
