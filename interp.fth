@@ -103,7 +103,7 @@
 
 // Outer Interpreter/Compiler
 // --------------------------
-: prompt (c") [ 4 c, 32 c, char o c, char k c, 10 c, ] type ;
+: prompt compiling @ 0= if ." ok" cr  else ." compiled" cr then ;
 
 : compile-number compiling @ if postpone lit , then ;
 : ingest-number compile-number ;
