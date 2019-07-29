@@ -26,6 +26,8 @@ SCRIPT_USER_VAR(rp);
 SCRIPT_USER_VAR(rp0);
 SCRIPT_USER_VAR(latest);
 SCRIPT_USER_VAR(current);
+SCRIPT_USER_VAR(norder);
+SCRIPT_USER_VAR(context);
 
 SCRIPT_CODE_WORD_EXPR(cell, sizeof(script_cell_t));
 SCRIPT_CODE_WORD_EXPR(tib, state->tib);

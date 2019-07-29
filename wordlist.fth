@@ -4,9 +4,6 @@ get-current constant core
 // -----------------
 : wordlist here 0 , ;
 
-variable #order 0 #order !
-create context 16 cells allot
-
 : get-order #order @ context over 1 - cells + swap begin dup while >r dup @ swap cell - r> 1 - repeat 2drop #order @ ;
 : set-order dup #order ! context swap begin dup while >r swap over ! cell + r> 1 - repeat 2drop ;
 

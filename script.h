@@ -61,6 +61,7 @@ struct _script_state {
 	uint8_t *latest;
 
 	script_wordlist_t *current;
+	script_cell_t norder;
 	script_wordlist_t context[16];
 } __attribute__((packed));
 

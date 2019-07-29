@@ -99,6 +99,8 @@ dict_start:
 	defcode "type", type
 	defcode "restart", restart
 	defcode "quit", quit
+	defcode "context", context
+	defcode "#order", norder
 
 	defdict "header", header
 	cfa docol
