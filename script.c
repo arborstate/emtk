@@ -24,6 +24,12 @@ SCRIPT_USER_VAR(sp);
 SCRIPT_USER_VAR(sp0);
 SCRIPT_USER_VAR(rp);
 SCRIPT_USER_VAR(rp0);
+SCRIPT_USER_VAR(latest);
+SCRIPT_USER_VAR(current);
+
+SCRIPT_CODE_WORD_EXPR(cell, sizeof(script_cell_t));
+SCRIPT_CODE_WORD_EXPR(tib, state->tib);
+SCRIPT_CODE_WORD_EXPR(pad, state->pad);
 
 SCRIPT_CODE_WORD(restart)
 {
@@ -266,22 +272,6 @@ SCRIPT_CODE_WORD(rel)
 	state->ip += 1;
 }
 
-SCRIPT_CODE_WORD(cell)
-{
-	script_push(state, sizeof(script_cell_t));
-}
-
-SCRIPT_CODE_WORD(tib)
-{
-	_STACK(0) = (script_cell_t)state->tib;
-	_STACKINC(1);
-}
-
-SCRIPT_CODE_WORD(pad)
-{
-	script_push(state, (script_cell_t)state->pad);
-}
-
 SCRIPT_CODE_WORD(comma)
 {
 	script_cell_t v = _STACK(1);
@@ -462,12 +452,6 @@ SCRIPT_CODE_WORD(get_current)
 SCRIPT_CODE_WORD(set_current)
 {
 	state->current = (script_wordlist_t *)script_pop(state);
-}
-
-SCRIPT_CODE_WORD(latest)
-{
-	_STACK(0) = (script_cell_t)&state->latest;
-	_STACKINC(1);
 }
 
 SCRIPT_CODE_WORD(interp_mode)
