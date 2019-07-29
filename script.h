@@ -54,11 +54,10 @@ struct _script_state {
 	script_word_t type;
 
 	script_cell_t base;
-
 	script_cell_t compiling;
 	uint8_t pad[128];
 
-	uint8_t *here;
+	uint8_t *dp;
 	uint8_t *latest;
 
 	script_wordlist_t *current;

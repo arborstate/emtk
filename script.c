@@ -20,7 +20,7 @@ SCRIPT_USER_VAR(compiling);
 
 SCRIPT_CODE_WORD(dp)
 {
-	script_push(state, (script_cell_t)&(state->here));
+	script_push(state, (script_cell_t)&(state->dp));
 }
 
 SCRIPT_CODE_WORD(restart)
@@ -285,10 +285,10 @@ SCRIPT_CODE_WORD(comma)
 	script_cell_t v = _STACK(1);
 	_STACKINC(-1);
 
-	script_cell_t *p = (script_cell_t *)state->here;
+	script_cell_t *p = (script_cell_t *)state->dp;
 
 	*p = v;
-	state->here += sizeof(script_cell_t);
+	state->dp += sizeof(script_cell_t);
 }
 
 SCRIPT_CODE_WORD(char_comma)
@@ -296,10 +296,10 @@ SCRIPT_CODE_WORD(char_comma)
 	script_cell_t v = _STACK(1);
 	_STACKINC(-1);
 
-	uint8_t *p = (uint8_t *)state->here;
+	uint8_t *p = (uint8_t *)state->dp;
 
 	*p = v & 0xFF;
-	state->here += sizeof(uint8_t);
+	state->dp += sizeof(uint8_t);
 }
 
 SCRIPT_CODE_WORD(quote_comma)
@@ -309,13 +309,13 @@ SCRIPT_CODE_WORD(quote_comma)
 
 	_STACKINC(-2);
 
-	*state->here = count;
-	state->here += 1;
+	*state->dp = count;
+	state->dp += 1;
 
 	for (size_t i = 0; i < count; i++) {
-		*state->here = *s;
+		*state->dp = *s;
 		s += 1;
-		state->here += 1;
+		state->dp += 1;
 	}
 }
 
@@ -480,7 +480,7 @@ SCRIPT_CODE_WORD(compile_mode)
 
 SCRIPT_CODE_WORD(align)
 {
-	state->here = SCRIPT_CELL_ALIGN(state->here);
+	state->dp = SCRIPT_CELL_ALIGN(state->dp);
 }
 
 SCRIPT_CODE_WORD(aligned)
@@ -652,37 +652,37 @@ script_add_words(script_state_t *state, const script_word_info_t *vocab)
 
 	while (vocab->code != NULL) {
 		// Patch in the previous word's info.
-		*(script_cell_t *)state->here = (script_cell_t)*(state->current);
+		*(script_cell_t *)state->dp = (script_cell_t)*(state->current);
 
 		// Make ourselves the link.
-		*(state->current) = (script_wordlist_t)state->here;
-		state->here += sizeof(script_cell_t);
+		*(state->current) = (script_wordlist_t)state->dp;
+		state->dp += sizeof(script_cell_t);
 
 		// Append the flags.
-		*(state->here) = vocab->flags;
-		state->here += 1;
+		*(state->dp) = vocab->flags;
+		state->dp += 1;
 
 		// Put down the word's name.
 		uint8_t count = strlen(vocab->name);
-		*(state->here) = count;
-		state->here += 1;
+		*(state->dp) = count;
+		state->dp += 1;
 
 		for (size_t i = 0; i < count; i++) {
-			*state->here = vocab->name[i];
-			state->here += 1;
+			*state->dp = vocab->name[i];
+			state->dp += 1;
 		}
 
 		// Align to a cell boundary.
-		state->here = SCRIPT_CELL_ALIGN(state->here);
+		state->dp = SCRIPT_CELL_ALIGN(state->dp);
 
 		// Put down the code address.
-		*(script_cell_t *)state->here = (script_cell_t)vocab->code;
-		state->here += sizeof(script_cell_t);
+		*(script_cell_t *)state->dp = (script_cell_t)vocab->code;
+		state->dp += sizeof(script_cell_t);
 
 		// XXX - For code words, this only supports 1 CELL.
 		// Put down the param address.
-		*(script_cell_t *)state->here = vocab->param;
-		state->here += sizeof(script_cell_t);
+		*(script_cell_t *)state->dp = vocab->param;
+		state->dp += sizeof(script_cell_t);
 
 		vocab++;
 	}
@@ -710,9 +710,9 @@ script_word_ingest(script_state_t *state, const char *s)
 	// Did we find the word in the dictionary?
 	if (xt != 0) {
 		if (state->compiling && !(info.flags & SCRIPT_FLAG_IMMEDIATE)) {
-			script_cell_t *here = (script_cell_t *)state->here;
+			script_cell_t *here = (script_cell_t *)state->dp;
 			*here = xt;
-			state->here += sizeof(script_cell_t);
+			state->dp += sizeof(script_cell_t);
 		} else {
 			state->ip = (script_cell_t *)&xt;
 
@@ -753,7 +753,7 @@ script_word_ingest(script_state_t *state, const char *s)
 					}
 				}
 
-				script_cell_t *here = (script_cell_t *)state->here;
+				script_cell_t *here = (script_cell_t *)state->dp;
 				// Append the handler for the literal we want on the stack.
 				*here = _lit_xt;
 				here += 1;
@@ -762,7 +762,7 @@ script_word_ingest(script_state_t *state, const char *s)
 				*here = v;
 				here += 1;
 
-				state->here += sizeof(script_cell_t) * 2;
+				state->dp += sizeof(script_cell_t) * 2;
 			} else {
 				script_push(state, v);
 			}
