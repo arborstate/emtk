@@ -37,14 +37,14 @@ struct _script_word_info {
 typedef struct _script_word_info script_word_info_t;
 
 struct _script_state {
+	script_cell_t *ip;
+	// Current XT
+	script_cell_t w;
+
 	script_cell_t sp0[SCRIPT_STACK_DEPTH];
 	script_cell_t *sp;
 	script_cell_t *rp0[SCRIPT_STACK_DEPTH];
 	script_cell_t **rp;
-
-	script_cell_t *ip;
-	// Current XT
-	script_cell_t w;
 
 	const char *tib;
 	size_t tibpos;
