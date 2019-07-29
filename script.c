@@ -19,11 +19,11 @@ SCRIPT_USER_VAR(base);
 SCRIPT_USER_VAR(tibpos);
 SCRIPT_USER_VAR(tiblen);
 SCRIPT_USER_VAR(compiling);
-
-SCRIPT_CODE_WORD(dp)
-{
-	script_push(state, (script_cell_t)&(state->dp));
-}
+SCRIPT_USER_VAR(dp);
+SCRIPT_USER_VAR(sp);
+SCRIPT_USER_VAR(sp0);
+SCRIPT_USER_VAR(rp);
+SCRIPT_USER_VAR(rp0);
 
 SCRIPT_CODE_WORD(restart)
 {

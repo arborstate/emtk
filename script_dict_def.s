@@ -33,6 +33,10 @@ xt_\label:
 
 dict_start:
 	.global script_dict_start
+	defcode "sp", sp
+	defcode "sp0", sp0
+	defcode "rp", rp
+	defcode "rp0", rp0
 	defcode "//",comment_line
 	defcode "lit",lit
 	defcode "rel",rel
