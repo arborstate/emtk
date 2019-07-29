@@ -7,6 +7,22 @@
 #include "log.h"
 #include "script.h"
 
+#define SCRIPT_USER_VAR(name)						\
+	SCRIPT_CODE_WORD(name)						\
+	{								\
+		script_push(state, (script_cell_t)&(state->name)); 	\
+	}
+
+SCRIPT_USER_VAR(base);
+SCRIPT_USER_VAR(tibpos);
+SCRIPT_USER_VAR(tiblen);
+SCRIPT_USER_VAR(compiling);
+
+SCRIPT_CODE_WORD(dp)
+{
+	script_push(state, (script_cell_t)&(state->here));
+}
+
 SCRIPT_CODE_WORD(restart)
 {
 	LOG_DEBUG("restarting script environment");
@@ -253,45 +269,15 @@ SCRIPT_CODE_WORD(cell)
 	script_push(state, sizeof(script_cell_t));
 }
 
-SCRIPT_CODE_WORD(base)
-{
-	_STACK(0) = (script_cell_t)&(state->base);
-	_STACKINC(1);
-}
-
-SCRIPT_CODE_WORD(dp)
-{
-	script_push(state, (script_cell_t)&(state->here));
-}
-
 SCRIPT_CODE_WORD(tib)
 {
 	_STACK(0) = (script_cell_t)state->tib;
 	_STACKINC(1);
 }
 
-
-SCRIPT_CODE_WORD(tiblen)
-{
-	_STACK(0) = (script_cell_t)&(state->tiblen);
-	_STACKINC(1);
-}
-
-SCRIPT_CODE_WORD(tibpos)
-{
-	_STACK(0) = (script_cell_t)&(state->tibpos);
-	_STACKINC(1);
-}
-
 SCRIPT_CODE_WORD(pad)
 {
 	script_push(state, (script_cell_t)state->pad);
-}
-
-SCRIPT_CODE_WORD(compiling)
-{
-	_STACK(0) = (script_cell_t)&(state->compiling);
-	_STACKINC(1);
 }
 
 SCRIPT_CODE_WORD(comma)
