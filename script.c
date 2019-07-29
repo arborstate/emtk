@@ -7,11 +7,13 @@
 #include "log.h"
 #include "script.h"
 
-#define SCRIPT_USER_VAR(name)						\
+#define SCRIPT_CODE_WORD_EXPR(name, expr)				\
 	SCRIPT_CODE_WORD(name)						\
 	{								\
-		script_push(state, (script_cell_t)&(state->name)); 	\
+		script_push(state, (script_cell_t)expr);		\
 	}
+
+#define SCRIPT_USER_VAR(name) SCRIPT_CODE_WORD_EXPR(name, &(state->name))
 
 SCRIPT_USER_VAR(base);
 SCRIPT_USER_VAR(tibpos);
