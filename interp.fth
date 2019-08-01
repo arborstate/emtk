@@ -25,6 +25,7 @@
 // String Handling
 // ---------------
 
+: bounds over + swap ;
 : not-quote? [char] " = 0= ;
 : " skip-delim in> @ tib over + swap ['] not-quote? seek-tib in> @ advance swap - ;
 : ", dup c, here over allot swap cmove ;
