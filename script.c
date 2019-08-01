@@ -560,6 +560,11 @@ SCRIPT_CODE_WORD(invert)
 	_STACK(1) = ~_STACK(1);
 }
 
+SCRIPT_CODE_WORD(negate)
+{
+	_STACK(1) = -_STACK(1);
+}
+
 SCRIPT_CODE_WORD(lshift)
 {
 	script_cell_t v = _STACK(2) << _STACK(1);

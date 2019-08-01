@@ -57,6 +57,7 @@ dict_start:
 	defcode "~", invert
 	defcode "+", add
 	defcode "-", sub
+	defcode "negate", negate
 	defcode "<<", lshift
 	defcode ">>", rshift
 	defcode "<", lt
