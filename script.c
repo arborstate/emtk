@@ -41,6 +41,7 @@ SCRIPT_CODE_WORD(restart)
 	state->rp = state->rp0;
 	state->base = 10;
 	state->compiling = 0;
+	state->tibpos = state->tiblen;
 }
 
 #define _STACK(pos) *(state->sp - pos)
