@@ -45,6 +45,7 @@ dict_start:
 	defcode "c@",cfetch
 	defcode "c!",cstore
 	defcode "dup",dup
+	defcode "?dup",dup_if
 	defcode "drop",drop
 	defcode "over",over
 	defcode "swap",swap

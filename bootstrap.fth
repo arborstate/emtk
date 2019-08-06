@@ -39,7 +39,6 @@
 
 // Extended Stack Manipulation
 // ---------------------------
-: ?dup dup if dup then ;
 : 2dup over over ;
 : 2drop drop drop ;
 

@@ -87,6 +87,14 @@ SCRIPT_CODE_WORD(dup)
 	_STACKINC(1);
 }
 
+SCRIPT_CODE_WORD(dup_if)
+{
+	if (_STACK(1)) {
+		_STACK(0) = _STACK(1);
+		_STACKINC(1);
+	}
+}
+
 SCRIPT_CODE_WORD(drop)
 {
 	_STACKINC(-1);
