@@ -124,13 +124,29 @@ dict_start:
 	xt align
 	xt exit
 
-	defdict ":", colon
+	defdict "(:)", colon_impl
 	cfa docol
-	xt header
 	xt lit
 	cfa docol
 	xt comma
 	xt compile_mode
+	xt exit
+
+	defdict ":", colon
+	cfa docol
+	xt header
+	xt colon_impl
+	xt exit
+
+	defdict ":noname", colon_noname
+	cfa docol
+	xt lit
+	.int 0
+	xt latest
+	xt store
+	xt dp
+	xt fetch
+	xt colon_impl
 	xt exit
 
 	defdict ";", semi, 1
@@ -141,8 +157,12 @@ dict_start:
 	xt comma
 	xt latest
 	xt fetch
+	xt dup_if
+	xt zero_branch
+	relpos if_latest_zero
 	xt get_current
 	xt store
+if_latest_zero:
 	xt exit
 
 	defdict "immediate", immediate, 1
