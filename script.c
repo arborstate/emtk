@@ -821,15 +821,31 @@ script_eval_buf(script_state_t *state, const char *s, size_t len)
 SCRIPT_CODE_WORD(quit)
 {
 	char buf[256];
-	while (1) {
+	int ret = 0;
+
+	while (ret == 0) {
 		script_push(state, (script_cell_t)buf);
 		script_push(state, sizeof(buf));
 		state->accept(state);
-		size_t tiblen = script_pop(state);
 
-		script_eval_buf(state, buf, tiblen);
-		script_push(state, (script_cell_t)" ok\n");
-		script_push(state, 5);
+		size_t tiblen = script_pop(state);
+		ret = script_eval_buf(state, buf, tiblen);
+
+		const char *prompt = " ok\n";
+
+		if (state->compiling) {
+			prompt = " compiled\n";
+		}
+
+		if (ret != 0) {
+			script_word_restart(state);
+			prompt = " abort\n";
+		}
+
+		script_push(state, (script_cell_t)prompt);
+		script_push(state, strlen(prompt));
 		state->type(state);
 	}
+
+	return;
 }
