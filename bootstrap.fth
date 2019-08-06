@@ -63,6 +63,8 @@
 // ---------------------
 
 : +! swap over @ + swap ! ;
+: !+ over ! cell + ;
+: @+ dup @ swap cell + swap ;
 
 
 // Character Memory Access
