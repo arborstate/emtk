@@ -28,6 +28,9 @@ xt_\label:
 	.int xt_\label
 	.endm
 
+	.macro relpos pos
+	.int \pos - .
+	.endm
 
 	#include "script.h"
 
