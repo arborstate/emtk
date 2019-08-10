@@ -3,7 +3,7 @@
 	.macro defdict name, label, flags=0
 	.globl dict_\label
 dict_\label :
-	.int link
+	.cell link
 	.set link,dict_\label
 
 	.byte \flags
@@ -11,26 +11,26 @@ dict_\label :
 0:
 	.ascii "\name"
 1:
-	.balign 4
+	.alignhere
 .global script_xt_\label
 script_xt_\label:
 	.endm
 
 	.macro defcode name, label, flags=0
 	defdict "\name", \label, \flags
-	.int script_word_\label
+	.cell script_word_\label
 	.endm
 
 	.macro cfa name
-	.int script_word_\name
+	.cell script_word_\name
 	.endm
 
 	.macro xt label
-	.int script_xt_\label
+	.cell script_xt_\label
 	.endm
 
 	.macro relpos pos
-	.int \pos - .
+	.cell (\pos - .)
 	.endm
 
 dict_start:
@@ -116,7 +116,7 @@ dict_start:
 	xt fetch
 	xt comma
 	xt lit
-	.int 0
+	.cell 0
 	xt char_comma
 	xt parse_name
 	xt quote_comma
@@ -140,7 +140,7 @@ dict_start:
 	defdict ":noname", colon_noname
 	cfa docol
 	xt lit
-	.int 0
+	.cell 0
 	xt latest
 	xt store
 	xt dp
@@ -167,7 +167,7 @@ if_latest_zero:
 	defdict "immediate", immediate, 1
 	cfa docol
 	xt lit
-	.int 1
+	.cell 1
 	xt latest
 	xt fetch
 	xt cell
@@ -179,10 +179,10 @@ if_latest_zero:
 	.set _dict_end_link, link
 	defdict "_dict_end", _dict_end
 	cfa docon
-	.int _dict_end_link
+	.cell _dict_end_link
 
-	.balign 4
+	.alignhere
 	.global script_dict_end
 script_dict_end:
-	.int link
+	.cell link
 	.endm
