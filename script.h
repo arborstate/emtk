@@ -69,7 +69,6 @@ typedef struct _script_state script_state_t;
 
 
 int script_state_init(script_state_t *state);
-void script_add_words(script_state_t *state, const script_word_info_t *vocab);
 
 void script_push(script_state_t *state, script_cell_t v);
 script_cell_t script_pop(script_state_t *state);
