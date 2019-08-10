@@ -55,7 +55,7 @@ struct _script_state {
 
 	script_cell_t base;
 	script_cell_t compiling;
-	uint8_t pad[128];
+	uint8_t pad[sizeof(script_cell_t) * 8];
 
 	uint8_t *dp;
 	uint8_t *latest;
