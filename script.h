@@ -21,20 +21,8 @@ typedef SCRIPT_CELL_TYPE script_cell_t;
 typedef script_cell_t * script_wordlist_t;
 
 struct _script_state;
-struct _script_word_info;
 
 typedef void (*script_word_t)(struct _script_state *);
-
-struct _script_word_info {
-	const char *name;
-	script_word_t code;
-	script_cell_t param;
-	uint8_t flags;
-	script_cell_t nt;
-	script_cell_t xt;
-};
-
-typedef struct _script_word_info script_word_info_t;
 
 struct _script_state {
 	script_cell_t *ip;

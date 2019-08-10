@@ -329,6 +329,17 @@ SCRIPT_CODE_WORD(over)
 	_STACKINC(1);
 }
 
+struct _script_word_info {
+	const char *name;
+	script_word_t code;
+	script_cell_t param;
+	uint8_t flags;
+	script_cell_t nt;
+	script_cell_t xt;
+};
+
+typedef struct _script_word_info script_word_info_t;
+
 script_word_info_t
 _word_find(script_state_t *state, const char *s, size_t slen)
 {
