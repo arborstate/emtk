@@ -12,7 +12,8 @@ dict_\label :
 	.ascii "\name"
 1:
 	.balign 4
-xt_\label:
+.global script_xt_\label
+script_xt_\label:
 	.endm
 
 	.macro defcode name, label, flags=0
@@ -25,7 +26,7 @@ xt_\label:
 	.endm
 
 	.macro xt label
-	.int xt_\label
+	.int script_xt_\label
 	.endm
 
 	.macro relpos pos

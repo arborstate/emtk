@@ -672,11 +672,12 @@ script_state_init(script_state_t *state)
 	return 0;
 }
 
+
+extern script_cell_t script_xt_lit;
+
 int
 script_word_ingest(script_state_t *state, const char *s)
 {
-	static script_cell_t _lit_xt = 0;
-
 	script_word_info_t info = _word_find(state, s, strlen(s));
 	script_cell_t xt = info.xt;
 
@@ -715,20 +716,9 @@ script_word_ingest(script_state_t *state, const char *s)
 
 		if (*endptr == '\0' && errno == 0) {
 			if (state->compiling) {
-				if (_lit_xt == 0) {
-					const char *lit_name = "lit";
-					script_word_info_t info = _word_find(state, lit_name, strlen(lit_name));
-					_lit_xt = info.xt;
-
-					if (_lit_xt == 0) {
-						LOG_ERROR("failed to find lit xt.");
-						return -1;
-					}
-				}
-
 				script_cell_t *here = (script_cell_t *)state->dp;
 				// Append the handler for the literal we want on the stack.
-				*here = _lit_xt;
+				*here = (script_cell_t)&script_xt_lit;
 				here += 1;
 
 				// Append the actual literal.
