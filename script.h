@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 #define SCRIPT_MAX_WORD_LEN 32
-#define SCRIPT_STACK_DEPTH 32
+#define SCRIPT_STACK_DEPTH 16
 
 #define SCRIPT_TRUE ((script_cell_t)-1)
 #define SCRIPT_FALSE ((script_cell_t)0)
