@@ -7,6 +7,7 @@
 #include "script.h"
 #include "log.h"
 
+extern script_cell_t script_dict_end;
 script_state_t *_script_state;
 
 void _accept_stdin(script_state_t *state)
@@ -43,37 +44,32 @@ int
 main(void)
 {
 	uint8_t heap[16384];
-	char buf[1024];
 
-	uint8_t *here = heap;
+	uint8_t *dp = heap;
 
-	_script_state = (script_state_t *)here;
-	script_state_init(_script_state);
-	here += sizeof(script_state_t);
+	script_wordlist_t *core = (script_wordlist_t *)dp;
+	*core = *(script_wordlist_t *)&script_dict_end;
+	dp += sizeof(script_wordlist_t);
 
-	_script_state->accept = _accept_stdin;
-	_script_state->type = _type_stdout;
-	_script_state->here = here;
+	script_state_t *state;
+	state = (script_state_t *)dp;
+	LOG_INFO("state is at %p", state);
+	dp += sizeof(script_state_t);
 
-	size_t len;
+	script_state_init(state);
+	state->dp = dp;
+	state->context[0] = core;
+	state->norder = 1;
+	state->current = core;
+	state->accept = _accept_stdin;
+	state->type = _type_stdout;
+
+	char tib[256];
+	size_t readlen;
+
 	while (1) {
-		len = read(0, buf, sizeof(buf) - 1);
-
-		if (len < 0) {
-			LOG_ERROR("error reading stdin: %s", strerror(errno));
-			return len;
-		}
-
-		if (len == 0) {
-
-			return 0;
-		}
-
-		// LOG_DEBUG("got input '%s'", buf);
-		buf[len] = '\0';
-
-		script_eval_buf(_script_state, buf, len);
-		LOG_INFO("ok");
+		readlen = snprintf(tib, sizeof(tib), "quit\n");
+		script_eval_buf(state, tib, readlen);
 	}
 
 	return 0;

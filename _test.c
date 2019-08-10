@@ -136,7 +136,7 @@ _test_script(void)
 	script_state_init(state);
 	here += sizeof(script_state_t);
 
-	state->here = here;
+	state->dp = here;
 
 	_W(16);
 	_W(base);

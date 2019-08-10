@@ -8,12 +8,12 @@ CLEAN_FILES += $(MAIN_OBJECTS)
 TARGETS += main
 
 TEST_SOURCE = script.c slcan.c isotp.c util.c _test.c log_stdout.c log.c
-TEST_OBJECTS = $(TEST_SOURCE:.c=.o)
+TEST_OBJECTS = $(TEST_SOURCE:.c=.o) script_dict.o
 CLEAN_FILES += $(TEST_OBJECTS)
 TARGETS += _test
 
 SREPL_SOURCE = srepl.c script.c util.c log_stdout.c log.c
-SREPL_OBJECTS = $(SREPL_SOURCE:.c=.o)
+SREPL_OBJECTS = $(SREPL_SOURCE:.c=.o) script_dict.o
 CLEAN_FILES += $(SREPL_OBJECTS)
 TARGETS += srepl
 
