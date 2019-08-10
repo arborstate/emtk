@@ -33,8 +33,6 @@ script_xt_\label:
 	.int \pos - .
 	.endm
 
-	#include "script.h"
-
 dict_start:
 	.global script_dict_start
 	defcode "sp", sp
