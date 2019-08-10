@@ -111,3 +111,11 @@
 : defer@ deferaddr @ ;
 
 : marker create get-current @ , here cell + , does> dup @ get-current ! cell + @ dp ! ;
+
+
+// Wordlist Helpers
+// ----------------
+
+: wordlist here 0 , ;
+: get-order #order @ context over 1 - cells + swap begin dup while >r dup @ swap cell - r> 1 - repeat 2drop #order @ ;
+: set-order dup #order ! context swap begin dup while >r swap over ! cell + r> 1 - repeat 2drop ;

@@ -334,33 +334,35 @@ _word_find(script_state_t *state, const char *s, size_t slen)
 {
 	script_word_info_t info = {0};
 
-	uint8_t *link = (uint8_t *)*(state->current);
-	while (link != NULL) {
-		uint8_t *name = link + sizeof(script_cell_t) + 2;
-		uint8_t count = *(name - 1);
-		uint8_t flags = *(name - 2);
+	for (size_t i = 0; i < state->norder; i++) {
+		uint8_t *link = (uint8_t *)state->context[i];
+		while (link != NULL) {
+			uint8_t *name = link + sizeof(script_cell_t) + 2;
+			uint8_t count = *(name - 1);
+			uint8_t flags = *(name - 2);
 
-		info.flags = flags;
+			info.flags = flags;
 
-		if (slen == count) {
-			size_t i = 0;
+			if (slen == count) {
+				size_t i = 0;
 
-			// See if we match.
-			while (i < count && (s[i] == name[i])) {
-				i += 1;
+				// See if we match.
+				while (i < count && (s[i] == name[i])) {
+					i += 1;
+				}
+
+				// We found a word.
+				if (i == count) {
+					// This is the XT.
+					info.xt = (script_cell_t)SCRIPT_CELL_ALIGN(name + count);
+					info.nt = (script_cell_t)link;
+
+					return info;
+				}
 			}
 
-			// We found a word.
-			if (i == count) {
-				// This is the XT.
-				info.xt = (script_cell_t)SCRIPT_CELL_ALIGN(name + count);
-				info.nt = (script_cell_t)link;
-
-				return info;
-			}
+			link = *(uint8_t **)link;
 		}
-
-		link = *(uint8_t **)link;
 	}
 
         // No match found.
@@ -647,48 +649,6 @@ script_pop(script_state_t *state) {
 
 #undef _STACKINC
 #undef _STACK
-
-void
-script_add_words(script_state_t *state, const script_word_info_t *vocab)
-{
-
-	while (vocab->code != NULL) {
-		// Patch in the previous word's info.
-		*(script_cell_t *)state->dp = (script_cell_t)*(state->current);
-
-		// Make ourselves the link.
-		*(state->current) = (script_wordlist_t)state->dp;
-		state->dp += sizeof(script_cell_t);
-
-		// Append the flags.
-		*(state->dp) = vocab->flags;
-		state->dp += 1;
-
-		// Put down the word's name.
-		uint8_t count = strlen(vocab->name);
-		*(state->dp) = count;
-		state->dp += 1;
-
-		for (size_t i = 0; i < count; i++) {
-			*state->dp = vocab->name[i];
-			state->dp += 1;
-		}
-
-		// Align to a cell boundary.
-		state->dp = SCRIPT_CELL_ALIGN(state->dp);
-
-		// Put down the code address.
-		*(script_cell_t *)state->dp = (script_cell_t)vocab->code;
-		state->dp += sizeof(script_cell_t);
-
-		// XXX - For code words, this only supports 1 CELL.
-		// Put down the param address.
-		*(script_cell_t *)state->dp = vocab->param;
-		state->dp += sizeof(script_cell_t);
-
-		vocab++;
-	}
-}
 
 int
 script_state_init(script_state_t *state)

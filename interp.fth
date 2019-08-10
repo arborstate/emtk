@@ -83,18 +83,7 @@
 // -----------------------
 : show-word dup . cell + dup c@ . 1 + count type cr ;
 : (words) base @ >r hex begin dup while dup show-word @ repeat drop r> base ! ;
-: words get-current @ (words) ;
-
-: wordlist-find-nt
-    @ >r
-    begin r@ while
-	    2dup r@ cell + 1 + count compare
-	    if 2drop r> exit then
-	    r> @ >r
-    repeat
-    2drop r> ;
-
-: find-nt get-current wordlist-find-nt ;
+: words get-order begin ?dup while >r @ (words) r> 1 - repeat ;
 
 
 // Error Handlings

@@ -62,7 +62,7 @@ struct _script_state {
 
 	script_wordlist_t *current;
 	script_cell_t norder;
-	script_wordlist_t context[16];
+	script_wordlist_t *context[16];
 } __attribute__((packed));
 
 typedef struct _script_state script_state_t;
