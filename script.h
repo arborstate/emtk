@@ -68,11 +68,6 @@ int script_eval_buf(script_state_t *state, const char *s, size_t len);
 void script_next(script_state_t *state);
 
 #define SCRIPT_CODE_WORD(x) void script_word_ ## x (script_state_t *state)
-
-#define SCRIPT_DICT_WORD_ALIAS(x, alias) { #alias, script_word_ ## x, 0, 0, 0}
-#define SCRIPT_DICT_WORD(x) SCRIPT_DICT_WORD_ALIAS(x, x)
-#define SCRIPT_DICT_END { "", NULL}
-
 #define SCRIPT_CELL_ALIGN(v) (((size_t)(v) % sizeof(script_cell_t)) ? ((v) + (sizeof(script_cell_t) - ((size_t)(v) % sizeof(script_cell_t)))) : (v))
 
 SCRIPT_CODE_WORD(quit);
