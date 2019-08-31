@@ -12,10 +12,15 @@
 
 #define SCRIPT_FLAG_IMMEDIATE (1 << 0)
 
-#ifndef SCRIPT_CELL_TYPE
-typedef int script_cell_t;
+
+#if __SIZEOF_POINTER__ == 4
+typedef uint32_t script_cell_t;
+typedef uint64_t script_double_cell_t;
+#elif __SIZEOF_POINTER__ == 8
+typedef uint64_t script_cell_t;
+typedef unsigned __int128 script_double_cell_t;
 #else
-typedef SCRIPT_CELL_TYPE script_cell_t;
+#error Unable to determine script cell size.
 #endif
 
 typedef script_cell_t * script_wordlist_t;
