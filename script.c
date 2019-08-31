@@ -145,6 +145,16 @@ SCRIPT_CODE_WORD(divmod)
 	_STACK(2) = dividend % divisor;
 }
 
+SCRIPT_CODE_WORD(mult_div)
+{
+	script_double_cell_t acc = _STACK(3);
+	acc *= _STACK(2);
+	acc /= _STACK(1);
+	_STACKINC(-2);
+
+	_STACK(1) = acc;
+}
+
 SCRIPT_CODE_WORD(type)
 {
 	if (state->type) {

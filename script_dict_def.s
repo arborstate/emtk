@@ -69,6 +69,7 @@ dict_start:
 	defcode ">=", gteq
 	defcode "0=", is_zero
 	defcode "*", mult
+	defcode "*/", mult_div
 	defcode "/mod", divmod
 	defcode ",", comma
 	defcode "c,", char_comma
